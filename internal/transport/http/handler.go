@@ -88,6 +88,7 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	videoGroup.DELETE("/:id", h.DeleteVideo)
 	videoGroup.GET("/channel/:id", h.GetVideosByChannelID)
 	videoGroup.GET("/random", h.GetRandomVideos)
+	videoGroup.GET("/search", h.SearchVideos)
 
 	// Scanner group
 	scannerGroup := e.Group("/scanner")

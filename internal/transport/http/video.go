@@ -20,6 +20,7 @@ type VideoService interface {
 	DeleteVideo(c echo.Context, id string) error
 	GetVideosByChannelID(c echo.Context, channelID string) ([]*ent.Video, error)
 	GetRandomVideos(c echo.Context, limit int) ([]*ent.Video, error)
+	SearchVideos(c echo.Context, limit int, offset int, query string) (video.Pagination, error)
 }
 
 type CreateVideoRequest struct {
@@ -76,6 +77,39 @@ func (h *Handler) GetVideos(c echo.Context) error {
 	channelId := c.QueryParam("channel_id")
 
 	videos, err := h.Service.VideoService.GetVideos(c, limit, offset, channelId)
+	if err != nil {
+		return echo.NewHTTPError(500, errors.New(500, err.Error()))
+	}
+
+	return c.JSON(200, videos)
+}
+
+func (h *Handler) SearchVideos(c echo.Context) error {
+
+	queryLimit := c.QueryParam("limit")
+	if queryLimit == "" {
+		queryLimit = "10"
+	}
+	limit, err := strconv.Atoi(queryLimit)
+	if err != nil {
+		return echo.NewHTTPError(400, errors.New(400, "invalid limit"))
+	}
+
+	queryOffset := c.QueryParam("offset")
+	if queryOffset == "" {
+		queryOffset = "0"
+	}
+	offset, err := strconv.Atoi(queryOffset)
+	if err != nil {
+		return echo.NewHTTPError(400, errors.New(400, "invalid offset"))
+	}
+
+	q := c.QueryParam("q")
+	if q == "" {
+		return echo.NewHTTPError(400, errors.New(400, "invalid query param q"))
+	}
+
+	videos, err := h.Service.VideoService.SearchVideos(c, limit, offset, q)
 	if err != nil {
 		return echo.NewHTTPError(500, errors.New(500, err.Error()))
 	}

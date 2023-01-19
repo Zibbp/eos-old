@@ -104,6 +104,41 @@ func (s *Service) GetVideos(c echo.Context, limit int, offset int, channelId str
 	return pagination, nil
 }
 
+func (s *Service) SearchVideos(c echo.Context, limit int, offset int, query string) (Pagination, error) {
+	var pagination Pagination
+
+	// Query builder
+	q := database.DB().Client.Video.Query()
+
+	// Filter by channel id
+	if query != "" {
+		q = q.Where(entVideo.TitleContainsFold(query))
+	}
+
+	v, err := q.Order(ent.Desc(entVideo.FieldUploadDate)).Limit(limit).Offset(offset).All(c.Request().Context())
+	if err != nil {
+		return pagination, fmt.Errorf("failed to get videos: %v", err)
+	}
+
+	// Get total count
+	totalCountQuery := database.DB().Client.Video.Query()
+	if query != "" {
+		totalCountQuery = totalCountQuery.Where(entVideo.TitleContainsFold(query))
+	}
+	totalCount, err := totalCountQuery.Count(context.Background())
+	if err != nil {
+		return pagination, fmt.Errorf("failed to get total count: %v", err)
+	}
+
+	pagination.Limit = limit
+	pagination.Offset = offset
+	pagination.TotalCount = totalCount
+	pagination.Pages = int(math.Ceil(float64(totalCount) / float64(limit)))
+	pagination.Data = v
+
+	return pagination, nil
+}
+
 func (s *Service) GetVideo(c echo.Context, id string) (*ent.Video, error) {
 	video, err := database.DB().Client.Video.Query().Where(entVideo.ID(id)).WithChannel().WithChapters().Only(c.Request().Context())
 	if err != nil {
