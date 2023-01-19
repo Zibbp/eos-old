@@ -1,0 +1,30 @@
+{
+  "build": { "dockerfile": "Dockerfile" },
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "github.copilot"
+      ]
+    }
+  },
+  // "forwardPorts": [4000],
+  "appPort": ["0.0.0.0:4050:4000"],
+  "mounts": [
+    {
+      "source": "/videos",
+      "target": "/videos",
+      "type": "bind"
+    },
+    {
+      "source": "/data-eos",
+      "target": "/data",
+      "type": "bind"
+    }
+  ],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace"
+}
