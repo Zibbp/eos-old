@@ -52,6 +52,10 @@ func (s *Service) GetComments(c echo.Context, limit int, offset int, videoId str
 		return pagination, fmt.Errorf("failed to get comments: %v", err)
 	}
 
+	if len(com) == 0 {
+		return pagination, nil
+	}
+
 	var comments []Comment
 	for _, comment := range com {
 		comments = append(comments, Comment{
@@ -77,6 +81,10 @@ func (s *Service) GetComments(c echo.Context, limit int, offset int, videoId str
 				}
 			}
 		}
+	}
+
+	if offset+limit > len(comments) {
+		limit = len(comments) - offset
 	}
 
 	// Pagination
