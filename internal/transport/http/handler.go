@@ -10,7 +10,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
+	"github.com/zibbp/eos/internal/metrics"
 	"github.com/zibbp/eos/internal/utils"
 )
 
@@ -97,6 +99,15 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	// Comment group
 	commentGroup := e.Group("/comments")
 	commentGroup.GET("", h.GetComments)
+
+	// Metrics
+	metricsGroup := e.Group("/metrics")
+	metricsGroup.GET("/prometheus", func(c echo.Context) error {
+		r := metrics.GatherMetrics()
+		handler := promhttp.HandlerFor(r, promhttp.HandlerOpts{})
+		handler.ServeHTTP(c.Response(), c.Request())
+		return nil
+	})
 }
 
 func (h *Handler) Serve() error {
