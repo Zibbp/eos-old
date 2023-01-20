@@ -1,0 +1,53 @@
+version: "3.3"
+services:
+  eos-api:
+    container_name: eos-api
+    image: ghcr.io/zibbp/eos:latest
+    restart: unless-stopped
+    environment:
+      - DB_HOST=eos-db
+      - DB_PORT=5432
+      - DB_USER=eos
+      - DB_PASS=SECRET
+      - DB_NAME=eos
+    volumes:
+      - /path/to/YouTube/videos:/videos:ro
+      - ./data:/data
+    depends_on:
+      - eos-db
+    ports:
+      - 4600:4000
+  eos-frontend:
+    container_name: eos-frontend
+    image: ghcr.io/zibbp/eos-frontend:latest
+    restart: unless-stopped
+    environment:
+      - API_URL=http://IP:4600
+      - CDN_URL=http://IP:4602/videos
+    ports:
+      - 4601:3000
+  eos-nginx:
+    container_name: eos-nginx
+    image: nginx
+    restart: unless-stopped
+    volumes:
+      - /path/to/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /path/to/YouTube/videos:/mnt/videos:ro
+    ports:
+      - 4602:8843
+  eos-db:
+    image: postgres:14
+    container_name: eos-db
+    restart: always
+    environment:
+      - POSTGRES_USER=eos
+      - POSTGRES_DB=eos
+      - POSTGRES_PASSWORD=SECRET
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - 4603:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
