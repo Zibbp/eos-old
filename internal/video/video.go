@@ -80,7 +80,7 @@ func (s *Service) GetVideos(c echo.Context, limit int, offset int, channelId str
 		query = query.Where(entVideo.HasChannelWith(entChannel.ID(channelId)))
 	}
 
-	v, err := query.Order(ent.Desc(entVideo.FieldUpdatedAt)).Limit(limit).Offset(offset).All(c.Request().Context())
+	v, err := query.Order(ent.Desc(entVideo.FieldUploadDate)).Limit(limit).Offset(offset).All(c.Request().Context())
 	if err != nil {
 		return pagination, fmt.Errorf("failed to get videos: %v", err)
 	}
