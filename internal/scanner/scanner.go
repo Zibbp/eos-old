@@ -1,41 +1,76 @@
 package scanner
 
 import (
-	"github.com/rs/zerolog/log"
-	"github.com/zibbp/eos/internal/channel"
-	"github.com/zibbp/eos/internal/kv"
+	"time"
+
 	"github.com/zibbp/eos/internal/video"
 )
 
-type Service struct {
-	ChannelService *channel.Service
-	VideoService   *video.Service
+const (
+	VideoDirectory = "/videos/dev"
+)
+
+type VideoInfo struct {
+	ID             string          `json:"id"`
+	Channel        string          `json:"channel"`
+	ChannelID      string          `json:"channel_id"`
+	Title          string          `json:"title"`
+	Formats        []Format        `json:"formats"`
+	Description    string          `json:"description"`
+	Uploader       string          `json:"uploader"`
+	Duration       int64           `json:"duration"`
+	ViewCount      int64           `json:"view_count"`
+	LikeCount      int64           `json:"like_count"`
+	DislikeCount   int64           `json:"dislike_count"`
+	Format         string          `json:"format"`
+	Width          int64           `json:"width"`
+	Height         int64           `json:"height"`
+	Resolution     string          `json:"resolution"`
+	FPS            float64         `json:"fps"`
+	VideoCodec     string          `json:"vcodec"`
+	VBR            float64         `json:"vbr"`
+	AudioCodec     string          `json:"acodec"`
+	ABR            float64         `json:"abr"`
+	Epoch          int64           `json:"epoch"`
+	CommentCount   int64           `json:"comment_count"`
+	VideoPath      string          `json:"video_path"`
+	ThumbnailPath  string          `json:"thumbnail_path"`
+	JsonPath       string          `json:"json_path"`
+	SubtitlePath   string          `json:"subtitle_path"`
+	UploadDate     string          `json:"upload_date"`
+	TempUploadDate time.Time       `json:"temp_upload_date"`
+	Path           string          `json:"path"`
+	Comments       []Comment       `json:"comments"`
+	Chapters       []video.Chapter `json:"chapters"`
 }
 
-func NewService(channelService *channel.Service, videoService *video.Service) *Service {
-	return &Service{
-		ChannelService: channelService,
-		VideoService:   videoService,
-	}
+type Comment struct {
+	ID               string    `json:"id"`
+	Text             string    `json:"text"`
+	Timestamp        int64     `json:"timestamp"`
+	LikeCount        int64     `json:"like_count"`
+	IsFavorited      bool      `json:"is_favorited"`
+	Author           string    `json:"author"`
+	AuthorID         string    `json:"author_id"`
+	AuthorThumbnail  string    `json:"author_thumbnail"`
+	AuthorIsUploader bool      `json:"author_is_uploader"`
+	Parent           string    `json:"parent"`
+	VideoID          string    `json:"video_id"`
+	Replies          []Comment `json:"replies"`
 }
 
-func (s *Service) Scan() (string, error) {
-	// Check if scanner is already running
-	checkScanner, ok := kv.DB().Get("scanner")
-	if ok && checkScanner == "running" {
-		return "scanner is already running", nil
-	}
+type Format struct {
+	FormatID   string     `json:"format_id"`
+	FormatNote string     `json:"format_note"`
+	Width      *int64     `json:"width,omitempty"`
+	Height     *int64     `json:"height,omitempty"`
+	FPS        *float64   `json:"fps,omitempty"`
+	Rows       *int64     `json:"rows,omitempty"`
+	Columns    *int64     `json:"columns,omitempty"`
+	Fragments  []Fragment `json:"fragments,omitempty"`
+}
 
-	// Set scanner to running
-	kv.DB().Set("scanner", "running")
-
-	// go routine to scan channels
-	go func() {
-		err := s.StartScanner()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to start scanner")
-		}
-	}()
-
-	return "scanner started", nil
+type Fragment struct {
+	URL      string  `json:"url"`
+	Duration float64 `json:"duration"`
 }

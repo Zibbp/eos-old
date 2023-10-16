@@ -612,7 +612,7 @@ func (vq *VideoQuery) querySpec() *sqlgraph.QuerySpec {
 			},
 		},
 		From:   vq.sql,
-		Unique: false,
+		Unique: true,
 	}
 	if unique := vq.unique; unique != nil {
 		_spec.Unique = *unique

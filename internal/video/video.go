@@ -223,3 +223,12 @@ func ScannerCreateChapter(chapterDto *Chapter, videoID string) error {
 
 	return nil
 }
+
+func ScannerGetVideo(videoID string) (*ent.Video, error) {
+	video, err := database.DB().Client.Video.Query().Where(entVideo.ID(videoID)).Only(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get video: %v", err)
+	}
+
+	return video, nil
+}

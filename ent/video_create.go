@@ -307,6 +307,48 @@ func (vc *VideoCreate) SetPath(s string) *VideoCreate {
 	return vc
 }
 
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (vc *VideoCreate) SetThumbnailWidth(i int) *VideoCreate {
+	vc.mutation.SetThumbnailWidth(i)
+	return vc
+}
+
+// SetNillableThumbnailWidth sets the "thumbnail_width" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailWidth(i *int) *VideoCreate {
+	if i != nil {
+		vc.SetThumbnailWidth(*i)
+	}
+	return vc
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (vc *VideoCreate) SetThumbnailHeight(i int) *VideoCreate {
+	vc.mutation.SetThumbnailHeight(i)
+	return vc
+}
+
+// SetNillableThumbnailHeight sets the "thumbnail_height" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailHeight(i *int) *VideoCreate {
+	if i != nil {
+		vc.SetThumbnailHeight(*i)
+	}
+	return vc
+}
+
+// SetThumbnailInterval sets the "thumbnail_interval" field.
+func (vc *VideoCreate) SetThumbnailInterval(f float64) *VideoCreate {
+	vc.mutation.SetThumbnailInterval(f)
+	return vc
+}
+
+// SetNillableThumbnailInterval sets the "thumbnail_interval" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailInterval(f *float64) *VideoCreate {
+	if f != nil {
+		vc.SetThumbnailInterval(*f)
+	}
+	return vc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (vc *VideoCreate) SetCreatedAt(t time.Time) *VideoCreate {
 	vc.mutation.SetCreatedAt(t)
@@ -612,6 +654,18 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 	if value, ok := vc.mutation.Path(); ok {
 		_spec.SetField(video.FieldPath, field.TypeString, value)
 		_node.Path = value
+	}
+	if value, ok := vc.mutation.ThumbnailWidth(); ok {
+		_spec.SetField(video.FieldThumbnailWidth, field.TypeInt, value)
+		_node.ThumbnailWidth = value
+	}
+	if value, ok := vc.mutation.ThumbnailHeight(); ok {
+		_spec.SetField(video.FieldThumbnailHeight, field.TypeInt, value)
+		_node.ThumbnailHeight = value
+	}
+	if value, ok := vc.mutation.ThumbnailInterval(); ok {
+		_spec.SetField(video.FieldThumbnailInterval, field.TypeFloat64, value)
+		_node.ThumbnailInterval = value
 	}
 	if value, ok := vc.mutation.CreatedAt(); ok {
 		_spec.SetField(video.FieldCreatedAt, field.TypeTime, value)

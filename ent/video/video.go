@@ -63,6 +63,12 @@ const (
 	FieldCaptionPath = "caption_path"
 	// FieldPath holds the string denoting the path field in the database.
 	FieldPath = "path"
+	// FieldThumbnailWidth holds the string denoting the thumbnail_width field in the database.
+	FieldThumbnailWidth = "thumbnail_width"
+	// FieldThumbnailHeight holds the string denoting the thumbnail_height field in the database.
+	FieldThumbnailHeight = "thumbnail_height"
+	// FieldThumbnailInterval holds the string denoting the thumbnail_interval field in the database.
+	FieldThumbnailInterval = "thumbnail_interval"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -127,6 +133,9 @@ var Columns = []string{
 	FieldJSONPath,
 	FieldCaptionPath,
 	FieldPath,
+	FieldThumbnailWidth,
+	FieldThumbnailHeight,
+	FieldThumbnailInterval,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }

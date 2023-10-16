@@ -69,6 +69,12 @@ type Video struct {
 	CaptionPath string `json:"caption_path,omitempty"`
 	// Path holds the value of the "path" field.
 	Path string `json:"path,omitempty"`
+	// ThumbnailWidth holds the value of the "thumbnail_width" field.
+	ThumbnailWidth int `json:"thumbnail_width,omitempty"`
+	// ThumbnailHeight holds the value of the "thumbnail_height" field.
+	ThumbnailHeight int `json:"thumbnail_height,omitempty"`
+	// ThumbnailInterval holds the value of the "thumbnail_interval" field.
+	ThumbnailInterval float64 `json:"thumbnail_interval,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -128,9 +134,9 @@ func (*Video) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case video.FieldFps, video.FieldAbr, video.FieldVbr:
+		case video.FieldFps, video.FieldAbr, video.FieldVbr, video.FieldThumbnailInterval:
 			values[i] = new(sql.NullFloat64)
-		case video.FieldDuration, video.FieldViewCount, video.FieldLikeCount, video.FieldDislikeCount, video.FieldWidth, video.FieldHeight, video.FieldEpoch, video.FieldCommentCount:
+		case video.FieldDuration, video.FieldViewCount, video.FieldLikeCount, video.FieldDislikeCount, video.FieldWidth, video.FieldHeight, video.FieldEpoch, video.FieldCommentCount, video.FieldThumbnailWidth, video.FieldThumbnailHeight:
 			values[i] = new(sql.NullInt64)
 		case video.FieldID, video.FieldTitle, video.FieldDescription, video.FieldUploader, video.FieldFormat, video.FieldResolution, video.FieldAudioCodec, video.FieldVideoCodec, video.FieldTags, video.FieldCategories, video.FieldVideoPath, video.FieldThumbnailPath, video.FieldJSONPath, video.FieldCaptionPath, video.FieldPath:
 			values[i] = new(sql.NullString)
@@ -315,6 +321,24 @@ func (v *Video) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				v.Path = value.String
 			}
+		case video.FieldThumbnailWidth:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_width", values[i])
+			} else if value.Valid {
+				v.ThumbnailWidth = int(value.Int64)
+			}
+		case video.FieldThumbnailHeight:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_height", values[i])
+			} else if value.Valid {
+				v.ThumbnailHeight = int(value.Int64)
+			}
+		case video.FieldThumbnailInterval:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_interval", values[i])
+			} else if value.Valid {
+				v.ThumbnailInterval = value.Float64
+			}
 		case video.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -454,6 +478,15 @@ func (v *Video) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("path=")
 	builder.WriteString(v.Path)
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_width=")
+	builder.WriteString(fmt.Sprintf("%v", v.ThumbnailWidth))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_height=")
+	builder.WriteString(fmt.Sprintf("%v", v.ThumbnailHeight))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_interval=")
+	builder.WriteString(fmt.Sprintf("%v", v.ThumbnailInterval))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(v.CreatedAt.Format(time.ANSIC))

@@ -19,7 +19,6 @@ import (
 type Services struct {
 	VideoService   VideoService
 	ChannelService ChannelService
-	ScannerService ScannerService
 	CommentService CommentService
 }
 
@@ -28,17 +27,18 @@ type Handler struct {
 	Service Services
 }
 
-func NewHandler(videoService VideoService, channelService ChannelService, scannerService ScannerService, commentService CommentService) *Handler {
+func NewHandler(videoService VideoService, channelService ChannelService, commentService CommentService) *Handler {
 	log.Debug().Msg("initializing http handler")
 	h := &Handler{
 		Server: echo.New(),
 		Service: Services{
 			VideoService:   videoService,
 			ChannelService: channelService,
-			ScannerService: scannerService,
 			CommentService: commentService,
 		},
 	}
+
+	h.Server.HideBanner = true
 
 	// Middleware
 	h.Server.Validator = &utils.CustomValidator{Validator: validator.New()}
@@ -92,13 +92,14 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	videoGroup.GET("/random", h.GetRandomVideos)
 	videoGroup.GET("/search", h.SearchVideos)
 
-	// Scanner group
-	scannerGroup := e.Group("/scanner")
-	scannerGroup.POST("/scan", h.Scan)
-
 	// Comment group
 	commentGroup := e.Group("/comments")
 	commentGroup.GET("", h.GetComments)
+
+	// Tasks group
+	tasksGroup := e.Group("/tasks")
+	tasksGroup.POST("/video/start_scanner", h.StartVideoScannerTask)
+	tasksGroup.POST("/video/generate_thumbnails", h.StartVideoGenerateThumbnailsTask)
 
 	// Metrics
 	metricsGroup := e.Group("/metrics")

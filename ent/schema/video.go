@@ -43,6 +43,9 @@ func (Video) Fields() []ent.Field {
 		field.String("json_path"),
 		field.String("caption_path").Optional(),
 		field.String("path"),
+		field.Int("thumbnail_width").Optional(),
+		field.Int("thumbnail_height").Optional(),
+		field.Float("thumbnail_interval").Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

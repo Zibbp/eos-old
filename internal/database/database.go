@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"os"
 
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
@@ -16,14 +15,8 @@ type Database struct {
 	Client *ent.Client
 }
 
-func InitializeDatabase() error {
+func InitializeDatabase(dbHost string, dbPort string, dbUser string, dbPass string, dbName string) error {
 	log.Debug().Msg("initializing database")
-
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	dbPass := os.Getenv("DB_PASS")
-	dbName := os.Getenv("DB_NAME")
 
 	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
 
