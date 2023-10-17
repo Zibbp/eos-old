@@ -1,4 +1,4 @@
-FROM golang:1.2 AS build-stage-01
+FROM golang:1 AS build-stage-01
 
 RUN mkdir /app
 ADD . /app
