@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	VideoDirectory = "/videos/dev"
+	VideoDirectory = "/videos"
 )
 
 type VideoInfo struct {

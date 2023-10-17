@@ -29,11 +29,11 @@ func init() {
 	videoFields := schema.Video{}.Fields()
 	_ = videoFields
 	// videoDescCreatedAt is the schema descriptor for created_at field.
-	videoDescCreatedAt := videoFields[30].Descriptor()
+	videoDescCreatedAt := videoFields[32].Descriptor()
 	// video.DefaultCreatedAt holds the default value on creation for the created_at field.
 	video.DefaultCreatedAt = videoDescCreatedAt.Default.(func() time.Time)
 	// videoDescUpdatedAt is the schema descriptor for updated_at field.
-	videoDescUpdatedAt := videoFields[31].Descriptor()
+	videoDescUpdatedAt := videoFields[33].Descriptor()
 	// video.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	video.DefaultUpdatedAt = videoDescUpdatedAt.Default.(func() time.Time)
 	// video.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func GetFoldersInDir(dir string) ([]string, error) {
@@ -111,8 +112,16 @@ func DownloadFile(url string, filePath string) error {
 	}
 	defer out.Close()
 
+	// Ensure file removal in case of failure.
+	// Do not remove if there's no error.
+	defer func() {
+		if err != nil {
+			os.Remove(filePath)
+		}
+	}()
+
 	// Get the data
-	resp, err := http.Get(url) // nolint:gosec
+	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
@@ -123,11 +132,27 @@ func DownloadFile(url string, filePath string) error {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	// Writer the body to file
+	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
+	return err
+}
 
-	return nil
+func GenerateVTT(baseURL string, width, height, duration int, interval float64) string {
+	vttContent := "WEBVTT\n\n"
+	tilesAcross := 5
+	numThumbnails := int(float64(duration) / interval)
+	for i := 0; i < numThumbnails; i++ {
+		x := (i % tilesAcross) * width
+		y := (i / tilesAcross) * height
+		startTime := time.Duration(float64(i)*interval) * time.Second
+		endTime := time.Duration(float64(i+1)*interval) * time.Second
+
+		vttContent += fmt.Sprintf(
+			"%02d:%02d:%02d.%03d --> %02d:%02d:%02d.%03d\n%s#xywh=%d,%d,%d,%d\n\n",
+			int(startTime.Hours()), int(startTime.Minutes())%60, int(startTime.Seconds())%60, startTime.Milliseconds()%1000,
+			int(endTime.Hours()), int(endTime.Minutes())%60, int(endTime.Seconds())%60, endTime.Milliseconds()%1000,
+			baseURL, x, y, width, height,
+		)
+	}
+	return vttContent
 }

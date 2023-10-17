@@ -21,6 +21,7 @@ type VideoService interface {
 	GetVideosByChannelID(c echo.Context, channelID string) ([]*ent.Video, error)
 	GetRandomVideos(c echo.Context, limit int) ([]*ent.Video, error)
 	SearchVideos(c echo.Context, limit int, offset int, query string) (video.Pagination, error)
+	GenerateThumbnailsVTT(c echo.Context, cdnURL string, videoID string) (string, error)
 }
 
 type CreateVideoRequest struct {
@@ -52,6 +53,11 @@ type CreateVideoRequest struct {
 	JSONPath      string  `json:"json_path" validate:"required"`
 	CaptionPath   string  `json:"caption_path"`
 	Path          string  `json:"path" validate:"required"`
+}
+
+type GenerateThumbnailsVTTRequest struct {
+	VideoID string `json:"video_id" validate:"required"`
+	CDNUrl  string `json:"cdn_url" validate:"required"`
 }
 
 func (h *Handler) GetVideos(c echo.Context) error {
@@ -274,4 +280,26 @@ func (h *Handler) GetRandomVideos(c echo.Context) error {
 		return echo.NewHTTPError(500, errors.New(500, err.Error()))
 	}
 	return c.JSON(200, videos)
+}
+
+func (h *Handler) GenerateThumbnailsVTT(c echo.Context) error {
+	var vttDto GenerateThumbnailsVTTRequest
+	if err := c.Bind(&vttDto); err != nil {
+		return echo.NewHTTPError(400, errors.New(400, err.Error()))
+	}
+
+	if err := c.Validate(vttDto); err != nil {
+		return echo.NewHTTPError(400, errors.New(400, err.Error()))
+	}
+
+	vID := vttDto.VideoID
+	cdnUrl := vttDto.CDNUrl
+
+	// generate vtt
+	vtt, err := h.Service.VideoService.GenerateThumbnailsVTT(c, cdnUrl, vID)
+	if err != nil {
+		return echo.NewHTTPError(500, errors.New(500, err.Error()))
+	}
+
+	return c.String(200, vtt)
 }

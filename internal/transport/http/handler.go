@@ -91,6 +91,7 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	videoGroup.GET("/channel/:id", h.GetVideosByChannelID)
 	videoGroup.GET("/random", h.GetRandomVideos)
 	videoGroup.GET("/search", h.SearchVideos)
+	videoGroup.POST("/generate_thumbnails_vtt", h.GenerateThumbnailsVTT)
 
 	// Comment group
 	commentGroup := e.Group("/comments")

@@ -102,9 +102,11 @@ var (
 		{Name: "json_path", Type: field.TypeString},
 		{Name: "caption_path", Type: field.TypeString, Nullable: true},
 		{Name: "path", Type: field.TypeString},
-		{Name: "thumbnail_width", Type: field.TypeInt, Nullable: true},
-		{Name: "thumbnail_height", Type: field.TypeInt, Nullable: true},
-		{Name: "thumbnail_interval", Type: field.TypeFloat64, Nullable: true},
+		{Name: "thumbnails_path", Type: field.TypeString, Nullable: true},
+		{Name: "thumbnails_width", Type: field.TypeInt, Nullable: true},
+		{Name: "thumbnails_height", Type: field.TypeInt, Nullable: true},
+		{Name: "thumbnails_interval", Type: field.TypeFloat64, Nullable: true},
+		{Name: "eos_generated_thumbnails", Type: field.TypeBool, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "channel_videos", Type: field.TypeString},
@@ -117,7 +119,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "videos_channels_videos",
-				Columns:    []*schema.Column{VideosColumns[32]},
+				Columns:    []*schema.Column{VideosColumns[34]},
 				RefColumns: []*schema.Column{ChannelsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

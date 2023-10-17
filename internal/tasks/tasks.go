@@ -215,6 +215,9 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 		case "webp":
 			importVideo.ThumbnailPath = fmt.Sprintf("%s/%s", videoDirectoryPath, videoFile)
 		case "jpg":
+			if videoFile == "thumbnails.jpg" {
+				continue
+			}
 			importVideo.ThumbnailPath = fmt.Sprintf("%s/%s", videoDirectoryPath, videoFile)
 		case "vtt":
 			importVideo.SubtitlePath = fmt.Sprintf("%s/%s", videoDirectoryPath, videoFile)
@@ -302,7 +305,7 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 	}
 
 	// create video
-	err = video.ScannerCreateVideo(videoDto, importVideo.ChannelID)
+	dbVideo, err := video.ScannerCreateVideo(videoDto, importVideo.ChannelID)
 	if err != nil {
 		log.Error().Err(err).Str("task", TypeVideoProcess).Msg("failed to create video")
 		return err
@@ -369,7 +372,14 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 				err = utils.DownloadFile(fragment.URL, fmt.Sprintf("/tmp/%s/thumbnail%04d.jpg", importVideo.ID, i))
 				if err != nil {
 					log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to download thumbnail: %s", fragment.URL)
-					continue
+
+					// allow this to fail and succeed job
+					err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
+					if err != nil {
+						log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to remove tmp directory: %s", importVideo.ID)
+						continue
+					}
+					return nil
 				}
 			}
 
@@ -391,6 +401,16 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 			err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
 			if err != nil {
 				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to remove tmp directory: %s", importVideo.ID)
+				return err
+			}
+
+			// calculate interval of thumbnails
+			interval := format.Fragments[0].Duration / 25
+
+			// update video
+			_, err = dbVideo.Update().SetThumbnailsPath(fmt.Sprintf("%s/%s", videoDirectoryPath, "thumbnails.jpg")).SetThumbnailsWidth(int(*format.Width)).SetThumbnailsHeight(int(*format.Height)).SetThumbnailsInterval(interval).Save(ctx)
+			if err != nil {
+				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to update video %s", importVideo.ID)
 				return err
 			}
 
