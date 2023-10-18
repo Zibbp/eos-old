@@ -8,11 +8,14 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	asynqMetrics "github.com/hibiken/asynq/x/metrics"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 	"github.com/zibbp/eos/internal/metrics"
+	"github.com/zibbp/eos/internal/redis"
 	"github.com/zibbp/eos/internal/utils"
 )
 
@@ -61,6 +64,15 @@ func (h *Handler) mapRoutes() {
 		return c.String(200, "EOS API")
 	})
 
+	// Metrics
+	inspector := redis.GetAsynqInspector()
+	tmp := asynqMetrics.NewQueueMetricsCollector(inspector.Inspector)
+	eosMetrics := metrics.NewEosMetricsCollector()
+	prometheus.MustRegister(tmp)
+	prometheus.MustRegister(eosMetrics)
+
+	h.Server.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
 	v1 := h.Server.Group("/api/v1")
 	groupV1Routes(v1, h)
 }
@@ -101,15 +113,6 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	tasksGroup := e.Group("/tasks")
 	tasksGroup.POST("/video/start_scanner", h.StartVideoScannerTask)
 	tasksGroup.POST("/video/generate_thumbnails", h.StartVideoGenerateThumbnailsTask)
-
-	// Metrics
-	metricsGroup := e.Group("/metrics")
-	metricsGroup.GET("/prometheus", func(c echo.Context) error {
-		r := metrics.GatherMetrics()
-		handler := promhttp.HandlerFor(r, promhttp.HandlerOpts{})
-		handler.ServeHTTP(c.Response(), c.Request())
-		return nil
-	})
 }
 
 func (h *Handler) Serve() error {

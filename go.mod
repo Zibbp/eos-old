@@ -36,6 +36,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
+	github.com/hibiken/asynq/x v0.0.0-20230908153724-6a7bf2ceff1e
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.7

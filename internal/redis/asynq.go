@@ -12,6 +12,12 @@ type AsynqClient struct {
 	Client *asynq.Client
 }
 
+var inspector *AsynqInspector
+
+type AsynqInspector struct {
+	Inspector *asynq.Inspector
+}
+
 func InitializeAsyncq(redisHost string, redisPort string, redisPass string, redisDB int) {
 	asynq_client := asynq.NewClient(asynq.RedisClientOpt{
 		Addr:     redisHost + ":" + redisPort,
@@ -21,6 +27,20 @@ func InitializeAsyncq(redisHost string, redisPort string, redisPass string, redi
 	// defer asynq_client.Close()
 	log.Debug().Msg("asynq client initialized")
 	client = &AsynqClient{Client: asynq_client}
+}
+
+func InitializeAsyncqInspector(redisHost string, redisPort string, redisPass string, redisDB int) {
+	asynq_inspector := asynq.NewInspector(asynq.RedisClientOpt{
+		Addr:     redisHost + ":" + redisPort,
+		Password: redisPass,
+		DB:       redisDB,
+	})
+	log.Debug().Msg("asynq inspector initialized")
+	inspector = &AsynqInspector{Inspector: asynq_inspector}
+}
+
+func GetAsynqInspector() *AsynqInspector {
+	return inspector
 }
 
 func GetAsynqClient() *AsynqClient {

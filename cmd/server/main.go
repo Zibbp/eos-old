@@ -38,6 +38,7 @@ func Run() error {
 
 	// redis
 	redis.InitializeAsyncq(c.REDIS_HOST, c.REDIS_PORT, c.REDIS_PASS, c.REDIS_DB)
+	redis.InitializeAsyncqInspector(c.REDIS_HOST, c.REDIS_PORT, c.REDIS_PASS, c.REDIS_DB)
 
 	// Services
 	channelService := channel.NewService()

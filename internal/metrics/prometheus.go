@@ -2,49 +2,62 @@ package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog/log"
 )
 
+type EosMetricsCollector struct{}
+
 // Metrics
 var (
-	totalVideos = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "video_count",
-		Help: "Total number of videos",
-	})
-	totalChannels = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "channel_count",
-		Help: "Total number of channels",
-	})
-	channelVideoCount = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "channel_video_count",
-		Help: "Total number of videos per channel",
-	}, []string{"channel"})
+	totalVideos = prometheus.NewDesc(
+		prometheus.BuildFQName("eos", "video", "count"),
+		"Total number of videos",
+		nil, nil,
+	)
+
+	totalChannels = prometheus.NewDesc(
+		prometheus.BuildFQName("eos", "channel", "count"),
+		"Total number of channels",
+		nil, nil,
+	)
+
+	channelVideoCount = prometheus.NewDesc(
+		prometheus.BuildFQName("eos", "channel", "video_count"),
+		"Number of videos in a channel",
+		[]string{"channel"}, nil,
+	)
 )
 
-func GatherMetrics() *prometheus.Registry {
+func (emc *EosMetricsCollector) Describe(ch chan<- *prometheus.Desc) {
+	prometheus.DescribeByCollect(emc, ch)
+}
+
+func (emc *EosMetricsCollector) Collect(ch chan<- prometheus.Metric) {
 	// Gather data
 	videoCount, err := getVideoCount()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get video count")
-		totalVideos.Set(0)
 	}
-	totalVideos.Set(float64(videoCount))
+
+	ch <- prometheus.MustNewConstMetric(totalVideos, prometheus.GaugeValue, float64(videoCount))
+
 	channelCount, err := getChannelCount()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get channel count")
-		totalChannels.Set(0)
 	}
-	totalChannels.Set(float64(channelCount))
+
+	ch <- prometheus.MustNewConstMetric(totalChannels, prometheus.GaugeValue, float64(channelCount))
+
 	channelVideoCountMap, err := getChannelVideoCount()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get channel video count")
 	}
-	for channel, count := range channelVideoCountMap {
-		channelVideoCount.WithLabelValues(channel).Set(float64(count))
-	}
 
-	r := prometheus.NewRegistry()
-	r.MustRegister(totalVideos, totalChannels, channelVideoCount)
-	return r
+	for channel, count := range channelVideoCountMap {
+		ch <- prometheus.MustNewConstMetric(channelVideoCount, prometheus.GaugeValue, float64(count), channel)
+	}
+}
+
+func NewEosMetricsCollector() *EosMetricsCollector {
+	return &EosMetricsCollector{}
 }
