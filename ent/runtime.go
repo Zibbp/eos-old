@@ -16,12 +16,16 @@ import (
 func init() {
 	channelFields := schema.Channel{}.Fields()
 	_ = channelFields
+	// channelDescGenerateThumbnails is the schema descriptor for generate_thumbnails field.
+	channelDescGenerateThumbnails := channelFields[4].Descriptor()
+	// channel.DefaultGenerateThumbnails holds the default value on creation for the generate_thumbnails field.
+	channel.DefaultGenerateThumbnails = channelDescGenerateThumbnails.Default.(bool)
 	// channelDescCreatedAt is the schema descriptor for created_at field.
-	channelDescCreatedAt := channelFields[4].Descriptor()
+	channelDescCreatedAt := channelFields[5].Descriptor()
 	// channel.DefaultCreatedAt holds the default value on creation for the created_at field.
 	channel.DefaultCreatedAt = channelDescCreatedAt.Default.(func() time.Time)
 	// channelDescUpdatedAt is the schema descriptor for updated_at field.
-	channelDescUpdatedAt := channelFields[5].Descriptor()
+	channelDescUpdatedAt := channelFields[6].Descriptor()
 	// channel.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	channel.DefaultUpdatedAt = channelDescUpdatedAt.Default.(func() time.Time)
 	// channel.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

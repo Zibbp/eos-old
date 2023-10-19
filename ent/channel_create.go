@@ -55,6 +55,20 @@ func (cc *ChannelCreate) SetNillableImagePath(s *string) *ChannelCreate {
 	return cc
 }
 
+// SetGenerateThumbnails sets the "generate_thumbnails" field.
+func (cc *ChannelCreate) SetGenerateThumbnails(b bool) *ChannelCreate {
+	cc.mutation.SetGenerateThumbnails(b)
+	return cc
+}
+
+// SetNillableGenerateThumbnails sets the "generate_thumbnails" field if the given value is not nil.
+func (cc *ChannelCreate) SetNillableGenerateThumbnails(b *bool) *ChannelCreate {
+	if b != nil {
+		cc.SetGenerateThumbnails(*b)
+	}
+	return cc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (cc *ChannelCreate) SetCreatedAt(t time.Time) *ChannelCreate {
 	cc.mutation.SetCreatedAt(t)
@@ -139,6 +153,10 @@ func (cc *ChannelCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *ChannelCreate) defaults() {
+	if _, ok := cc.mutation.GenerateThumbnails(); !ok {
+		v := channel.DefaultGenerateThumbnails
+		cc.mutation.SetGenerateThumbnails(v)
+	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		v := channel.DefaultCreatedAt()
 		cc.mutation.SetCreatedAt(v)
@@ -153,6 +171,9 @@ func (cc *ChannelCreate) defaults() {
 func (cc *ChannelCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Channel.name"`)}
+	}
+	if _, ok := cc.mutation.GenerateThumbnails(); !ok {
+		return &ValidationError{Name: "generate_thumbnails", err: errors.New(`ent: missing required field "Channel.generate_thumbnails"`)}
 	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Channel.created_at"`)}
@@ -212,6 +233,10 @@ func (cc *ChannelCreate) createSpec() (*Channel, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.ImagePath(); ok {
 		_spec.SetField(channel.FieldImagePath, field.TypeString, value)
 		_node.ImagePath = value
+	}
+	if value, ok := cc.mutation.GenerateThumbnails(); ok {
+		_spec.SetField(channel.FieldGenerateThumbnails, field.TypeBool, value)
+		_node.GenerateThumbnails = value
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.SetField(channel.FieldCreatedAt, field.TypeTime, value)

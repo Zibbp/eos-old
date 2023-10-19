@@ -20,6 +20,7 @@ func (Channel) Fields() []ent.Field {
 		field.String("name").Unique(),
 		field.String("description").Optional(),
 		field.String("image_path").Optional(),
+		field.Bool("generate_thumbnails").Default(false),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

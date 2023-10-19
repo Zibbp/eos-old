@@ -37,21 +37,22 @@ const (
 // ChannelMutation represents an operation that mutates the Channel nodes in the graph.
 type ChannelMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	name          *string
-	description   *string
-	image_path    *string
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	videos        map[string]struct{}
-	removedvideos map[string]struct{}
-	clearedvideos bool
-	done          bool
-	oldValue      func(context.Context) (*Channel, error)
-	predicates    []predicate.Channel
+	op                  Op
+	typ                 string
+	id                  *string
+	name                *string
+	description         *string
+	image_path          *string
+	generate_thumbnails *bool
+	created_at          *time.Time
+	updated_at          *time.Time
+	clearedFields       map[string]struct{}
+	videos              map[string]struct{}
+	removedvideos       map[string]struct{}
+	clearedvideos       bool
+	done                bool
+	oldValue            func(context.Context) (*Channel, error)
+	predicates          []predicate.Channel
 }
 
 var _ ent.Mutation = (*ChannelMutation)(nil)
@@ -292,6 +293,42 @@ func (m *ChannelMutation) ResetImagePath() {
 	delete(m.clearedFields, channel.FieldImagePath)
 }
 
+// SetGenerateThumbnails sets the "generate_thumbnails" field.
+func (m *ChannelMutation) SetGenerateThumbnails(b bool) {
+	m.generate_thumbnails = &b
+}
+
+// GenerateThumbnails returns the value of the "generate_thumbnails" field in the mutation.
+func (m *ChannelMutation) GenerateThumbnails() (r bool, exists bool) {
+	v := m.generate_thumbnails
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGenerateThumbnails returns the old "generate_thumbnails" field's value of the Channel entity.
+// If the Channel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChannelMutation) OldGenerateThumbnails(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGenerateThumbnails is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGenerateThumbnails requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGenerateThumbnails: %w", err)
+	}
+	return oldValue.GenerateThumbnails, nil
+}
+
+// ResetGenerateThumbnails resets all changes to the "generate_thumbnails" field.
+func (m *ChannelMutation) ResetGenerateThumbnails() {
+	m.generate_thumbnails = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ChannelMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -452,7 +489,7 @@ func (m *ChannelMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChannelMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, channel.FieldName)
 	}
@@ -461,6 +498,9 @@ func (m *ChannelMutation) Fields() []string {
 	}
 	if m.image_path != nil {
 		fields = append(fields, channel.FieldImagePath)
+	}
+	if m.generate_thumbnails != nil {
+		fields = append(fields, channel.FieldGenerateThumbnails)
 	}
 	if m.created_at != nil {
 		fields = append(fields, channel.FieldCreatedAt)
@@ -482,6 +522,8 @@ func (m *ChannelMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case channel.FieldImagePath:
 		return m.ImagePath()
+	case channel.FieldGenerateThumbnails:
+		return m.GenerateThumbnails()
 	case channel.FieldCreatedAt:
 		return m.CreatedAt()
 	case channel.FieldUpdatedAt:
@@ -501,6 +543,8 @@ func (m *ChannelMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDescription(ctx)
 	case channel.FieldImagePath:
 		return m.OldImagePath(ctx)
+	case channel.FieldGenerateThumbnails:
+		return m.OldGenerateThumbnails(ctx)
 	case channel.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case channel.FieldUpdatedAt:
@@ -534,6 +578,13 @@ func (m *ChannelMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImagePath(v)
+		return nil
+	case channel.FieldGenerateThumbnails:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGenerateThumbnails(v)
 		return nil
 	case channel.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -621,6 +672,9 @@ func (m *ChannelMutation) ResetField(name string) error {
 		return nil
 	case channel.FieldImagePath:
 		m.ResetImagePath()
+		return nil
+	case channel.FieldGenerateThumbnails:
+		m.ResetGenerateThumbnails()
 		return nil
 	case channel.FieldCreatedAt:
 		m.ResetCreatedAt()

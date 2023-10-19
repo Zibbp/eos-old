@@ -70,6 +70,11 @@ func ImagePath(v string) predicate.Channel {
 	return predicate.Channel(sql.FieldEQ(FieldImagePath, v))
 }
 
+// GenerateThumbnails applies equality check predicate on the "generate_thumbnails" field. It's identical to GenerateThumbnailsEQ.
+func GenerateThumbnails(v bool) predicate.Channel {
+	return predicate.Channel(sql.FieldEQ(FieldGenerateThumbnails, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Channel {
 	return predicate.Channel(sql.FieldEQ(FieldCreatedAt, v))
@@ -293,6 +298,16 @@ func ImagePathEqualFold(v string) predicate.Channel {
 // ImagePathContainsFold applies the ContainsFold predicate on the "image_path" field.
 func ImagePathContainsFold(v string) predicate.Channel {
 	return predicate.Channel(sql.FieldContainsFold(FieldImagePath, v))
+}
+
+// GenerateThumbnailsEQ applies the EQ predicate on the "generate_thumbnails" field.
+func GenerateThumbnailsEQ(v bool) predicate.Channel {
+	return predicate.Channel(sql.FieldEQ(FieldGenerateThumbnails, v))
+}
+
+// GenerateThumbnailsNEQ applies the NEQ predicate on the "generate_thumbnails" field.
+func GenerateThumbnailsNEQ(v bool) predicate.Channel {
+	return predicate.Channel(sql.FieldNEQ(FieldGenerateThumbnails, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

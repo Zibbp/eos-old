@@ -75,6 +75,20 @@ func (cu *ChannelUpdate) ClearImagePath() *ChannelUpdate {
 	return cu
 }
 
+// SetGenerateThumbnails sets the "generate_thumbnails" field.
+func (cu *ChannelUpdate) SetGenerateThumbnails(b bool) *ChannelUpdate {
+	cu.mutation.SetGenerateThumbnails(b)
+	return cu
+}
+
+// SetNillableGenerateThumbnails sets the "generate_thumbnails" field if the given value is not nil.
+func (cu *ChannelUpdate) SetNillableGenerateThumbnails(b *bool) *ChannelUpdate {
+	if b != nil {
+		cu.SetGenerateThumbnails(*b)
+	}
+	return cu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (cu *ChannelUpdate) SetUpdatedAt(t time.Time) *ChannelUpdate {
 	cu.mutation.SetUpdatedAt(t)
@@ -190,6 +204,9 @@ func (cu *ChannelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ImagePathCleared() {
 		_spec.ClearField(channel.FieldImagePath, field.TypeString)
+	}
+	if value, ok := cu.mutation.GenerateThumbnails(); ok {
+		_spec.SetField(channel.FieldGenerateThumbnails, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.UpdatedAt(); ok {
 		_spec.SetField(channel.FieldUpdatedAt, field.TypeTime, value)
@@ -311,6 +328,20 @@ func (cuo *ChannelUpdateOne) SetNillableImagePath(s *string) *ChannelUpdateOne {
 // ClearImagePath clears the value of the "image_path" field.
 func (cuo *ChannelUpdateOne) ClearImagePath() *ChannelUpdateOne {
 	cuo.mutation.ClearImagePath()
+	return cuo
+}
+
+// SetGenerateThumbnails sets the "generate_thumbnails" field.
+func (cuo *ChannelUpdateOne) SetGenerateThumbnails(b bool) *ChannelUpdateOne {
+	cuo.mutation.SetGenerateThumbnails(b)
+	return cuo
+}
+
+// SetNillableGenerateThumbnails sets the "generate_thumbnails" field if the given value is not nil.
+func (cuo *ChannelUpdateOne) SetNillableGenerateThumbnails(b *bool) *ChannelUpdateOne {
+	if b != nil {
+		cuo.SetGenerateThumbnails(*b)
+	}
 	return cuo
 }
 
@@ -453,6 +484,9 @@ func (cuo *ChannelUpdateOne) sqlSave(ctx context.Context) (_node *Channel, err e
 	}
 	if cuo.mutation.ImagePathCleared() {
 		_spec.ClearField(channel.FieldImagePath, field.TypeString)
+	}
+	if value, ok := cuo.mutation.GenerateThumbnails(); ok {
+		_spec.SetField(channel.FieldGenerateThumbnails, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(channel.FieldUpdatedAt, field.TypeTime, value)
