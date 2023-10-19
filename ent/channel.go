@@ -22,6 +22,8 @@ type Channel struct {
 	Description string `json:"description,omitempty"`
 	// ImagePath holds the value of the "image_path" field.
 	ImagePath string `json:"image_path,omitempty"`
+	// GenerateThumbnails holds the value of the "generate_thumbnails" field.
+	GenerateThumbnails bool `json:"generate_thumbnails,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -54,6 +56,8 @@ func (*Channel) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case channel.FieldGenerateThumbnails:
+			values[i] = new(sql.NullBool)
 		case channel.FieldID, channel.FieldName, channel.FieldDescription, channel.FieldImagePath:
 			values[i] = new(sql.NullString)
 		case channel.FieldCreatedAt, channel.FieldUpdatedAt:
@@ -96,6 +100,12 @@ func (c *Channel) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field image_path", values[i])
 			} else if value.Valid {
 				c.ImagePath = value.String
+			}
+		case channel.FieldGenerateThumbnails:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field generate_thumbnails", values[i])
+			} else if value.Valid {
+				c.GenerateThumbnails = value.Bool
 			}
 		case channel.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -150,6 +160,9 @@ func (c *Channel) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("image_path=")
 	builder.WriteString(c.ImagePath)
+	builder.WriteString(", ")
+	builder.WriteString("generate_thumbnails=")
+	builder.WriteString(fmt.Sprintf("%v", c.GenerateThumbnails))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(c.CreatedAt.Format(time.ANSIC))

@@ -17,6 +17,8 @@ const (
 	FieldDescription = "description"
 	// FieldImagePath holds the string denoting the image_path field in the database.
 	FieldImagePath = "image_path"
+	// FieldGenerateThumbnails holds the string denoting the generate_thumbnails field in the database.
+	FieldGenerateThumbnails = "generate_thumbnails"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -40,6 +42,7 @@ var Columns = []string{
 	FieldName,
 	FieldDescription,
 	FieldImagePath,
+	FieldGenerateThumbnails,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -55,6 +58,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultGenerateThumbnails holds the default value on creation for the "generate_thumbnails" field.
+	DefaultGenerateThumbnails bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
