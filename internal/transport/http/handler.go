@@ -8,18 +8,20 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	asynqMetrics "github.com/hibiken/asynq/x/metrics"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 	"github.com/zibbp/eos/internal/metrics"
+	"github.com/zibbp/eos/internal/redis"
 	"github.com/zibbp/eos/internal/utils"
 )
 
 type Services struct {
 	VideoService   VideoService
 	ChannelService ChannelService
-	ScannerService ScannerService
 	CommentService CommentService
 }
 
@@ -28,17 +30,18 @@ type Handler struct {
 	Service Services
 }
 
-func NewHandler(videoService VideoService, channelService ChannelService, scannerService ScannerService, commentService CommentService) *Handler {
+func NewHandler(videoService VideoService, channelService ChannelService, commentService CommentService) *Handler {
 	log.Debug().Msg("initializing http handler")
 	h := &Handler{
 		Server: echo.New(),
 		Service: Services{
 			VideoService:   videoService,
 			ChannelService: channelService,
-			ScannerService: scannerService,
 			CommentService: commentService,
 		},
 	}
+
+	h.Server.HideBanner = true
 
 	// Middleware
 	h.Server.Validator = &utils.CustomValidator{Validator: validator.New()}
@@ -60,6 +63,15 @@ func (h *Handler) mapRoutes() {
 	h.Server.GET("/", func(c echo.Context) error {
 		return c.String(200, "EOS API")
 	})
+
+	// Metrics
+	inspector := redis.GetAsynqInspector()
+	tmp := asynqMetrics.NewQueueMetricsCollector(inspector.Inspector)
+	eosMetrics := metrics.NewEosMetricsCollector()
+	prometheus.MustRegister(tmp)
+	prometheus.MustRegister(eosMetrics)
+
+	h.Server.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	v1 := h.Server.Group("/api/v1")
 	groupV1Routes(v1, h)
@@ -91,23 +103,16 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	videoGroup.GET("/channel/:id", h.GetVideosByChannelID)
 	videoGroup.GET("/random", h.GetRandomVideos)
 	videoGroup.GET("/search", h.SearchVideos)
-
-	// Scanner group
-	scannerGroup := e.Group("/scanner")
-	scannerGroup.POST("/scan", h.Scan)
+	videoGroup.POST("/generate_thumbnails_vtt", h.GenerateThumbnailsVTT)
 
 	// Comment group
 	commentGroup := e.Group("/comments")
 	commentGroup.GET("", h.GetComments)
 
-	// Metrics
-	metricsGroup := e.Group("/metrics")
-	metricsGroup.GET("/prometheus", func(c echo.Context) error {
-		r := metrics.GatherMetrics()
-		handler := promhttp.HandlerFor(r, promhttp.HandlerOpts{})
-		handler.ServeHTTP(c.Response(), c.Request())
-		return nil
-	})
+	// Tasks group
+	tasksGroup := e.Group("/tasks")
+	tasksGroup.POST("/video/start_scanner", h.StartVideoScannerTask)
+	tasksGroup.POST("/video/generate_thumbnails", h.StartVideoGenerateThumbnailsTask)
 }
 
 func (h *Handler) Serve() error {

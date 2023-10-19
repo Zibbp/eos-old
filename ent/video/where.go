@@ -185,6 +185,31 @@ func Path(v string) predicate.Video {
 	return predicate.Video(sql.FieldEQ(FieldPath, v))
 }
 
+// ThumbnailsPath applies equality check predicate on the "thumbnails_path" field. It's identical to ThumbnailsPathEQ.
+func ThumbnailsPath(v string) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsWidth applies equality check predicate on the "thumbnails_width" field. It's identical to ThumbnailsWidthEQ.
+func ThumbnailsWidth(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsHeight applies equality check predicate on the "thumbnails_height" field. It's identical to ThumbnailsHeightEQ.
+func ThumbnailsHeight(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsInterval applies equality check predicate on the "thumbnails_interval" field. It's identical to ThumbnailsIntervalEQ.
+func ThumbnailsInterval(v float64) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsInterval, v))
+}
+
+// EosGeneratedThumbnails applies equality check predicate on the "eos_generated_thumbnails" field. It's identical to EosGeneratedThumbnailsEQ.
+func EosGeneratedThumbnails(v bool) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldEosGeneratedThumbnails, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Video {
 	return predicate.Video(sql.FieldEQ(FieldCreatedAt, v))
@@ -1743,6 +1768,251 @@ func PathEqualFold(v string) predicate.Video {
 // PathContainsFold applies the ContainsFold predicate on the "path" field.
 func PathContainsFold(v string) predicate.Video {
 	return predicate.Video(sql.FieldContainsFold(FieldPath, v))
+}
+
+// ThumbnailsPathEQ applies the EQ predicate on the "thumbnails_path" field.
+func ThumbnailsPathEQ(v string) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathNEQ applies the NEQ predicate on the "thumbnails_path" field.
+func ThumbnailsPathNEQ(v string) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathIn applies the In predicate on the "thumbnails_path" field.
+func ThumbnailsPathIn(vs ...string) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldThumbnailsPath, vs...))
+}
+
+// ThumbnailsPathNotIn applies the NotIn predicate on the "thumbnails_path" field.
+func ThumbnailsPathNotIn(vs ...string) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldThumbnailsPath, vs...))
+}
+
+// ThumbnailsPathGT applies the GT predicate on the "thumbnails_path" field.
+func ThumbnailsPathGT(v string) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathGTE applies the GTE predicate on the "thumbnails_path" field.
+func ThumbnailsPathGTE(v string) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathLT applies the LT predicate on the "thumbnails_path" field.
+func ThumbnailsPathLT(v string) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathLTE applies the LTE predicate on the "thumbnails_path" field.
+func ThumbnailsPathLTE(v string) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathContains applies the Contains predicate on the "thumbnails_path" field.
+func ThumbnailsPathContains(v string) predicate.Video {
+	return predicate.Video(sql.FieldContains(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathHasPrefix applies the HasPrefix predicate on the "thumbnails_path" field.
+func ThumbnailsPathHasPrefix(v string) predicate.Video {
+	return predicate.Video(sql.FieldHasPrefix(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathHasSuffix applies the HasSuffix predicate on the "thumbnails_path" field.
+func ThumbnailsPathHasSuffix(v string) predicate.Video {
+	return predicate.Video(sql.FieldHasSuffix(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathIsNil applies the IsNil predicate on the "thumbnails_path" field.
+func ThumbnailsPathIsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldThumbnailsPath))
+}
+
+// ThumbnailsPathNotNil applies the NotNil predicate on the "thumbnails_path" field.
+func ThumbnailsPathNotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldThumbnailsPath))
+}
+
+// ThumbnailsPathEqualFold applies the EqualFold predicate on the "thumbnails_path" field.
+func ThumbnailsPathEqualFold(v string) predicate.Video {
+	return predicate.Video(sql.FieldEqualFold(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsPathContainsFold applies the ContainsFold predicate on the "thumbnails_path" field.
+func ThumbnailsPathContainsFold(v string) predicate.Video {
+	return predicate.Video(sql.FieldContainsFold(FieldThumbnailsPath, v))
+}
+
+// ThumbnailsWidthEQ applies the EQ predicate on the "thumbnails_width" field.
+func ThumbnailsWidthEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsWidthNEQ applies the NEQ predicate on the "thumbnails_width" field.
+func ThumbnailsWidthNEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsWidthIn applies the In predicate on the "thumbnails_width" field.
+func ThumbnailsWidthIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldThumbnailsWidth, vs...))
+}
+
+// ThumbnailsWidthNotIn applies the NotIn predicate on the "thumbnails_width" field.
+func ThumbnailsWidthNotIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldThumbnailsWidth, vs...))
+}
+
+// ThumbnailsWidthGT applies the GT predicate on the "thumbnails_width" field.
+func ThumbnailsWidthGT(v int) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsWidthGTE applies the GTE predicate on the "thumbnails_width" field.
+func ThumbnailsWidthGTE(v int) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsWidthLT applies the LT predicate on the "thumbnails_width" field.
+func ThumbnailsWidthLT(v int) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsWidthLTE applies the LTE predicate on the "thumbnails_width" field.
+func ThumbnailsWidthLTE(v int) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldThumbnailsWidth, v))
+}
+
+// ThumbnailsWidthIsNil applies the IsNil predicate on the "thumbnails_width" field.
+func ThumbnailsWidthIsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldThumbnailsWidth))
+}
+
+// ThumbnailsWidthNotNil applies the NotNil predicate on the "thumbnails_width" field.
+func ThumbnailsWidthNotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldThumbnailsWidth))
+}
+
+// ThumbnailsHeightEQ applies the EQ predicate on the "thumbnails_height" field.
+func ThumbnailsHeightEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsHeightNEQ applies the NEQ predicate on the "thumbnails_height" field.
+func ThumbnailsHeightNEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsHeightIn applies the In predicate on the "thumbnails_height" field.
+func ThumbnailsHeightIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldThumbnailsHeight, vs...))
+}
+
+// ThumbnailsHeightNotIn applies the NotIn predicate on the "thumbnails_height" field.
+func ThumbnailsHeightNotIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldThumbnailsHeight, vs...))
+}
+
+// ThumbnailsHeightGT applies the GT predicate on the "thumbnails_height" field.
+func ThumbnailsHeightGT(v int) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsHeightGTE applies the GTE predicate on the "thumbnails_height" field.
+func ThumbnailsHeightGTE(v int) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsHeightLT applies the LT predicate on the "thumbnails_height" field.
+func ThumbnailsHeightLT(v int) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsHeightLTE applies the LTE predicate on the "thumbnails_height" field.
+func ThumbnailsHeightLTE(v int) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldThumbnailsHeight, v))
+}
+
+// ThumbnailsHeightIsNil applies the IsNil predicate on the "thumbnails_height" field.
+func ThumbnailsHeightIsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldThumbnailsHeight))
+}
+
+// ThumbnailsHeightNotNil applies the NotNil predicate on the "thumbnails_height" field.
+func ThumbnailsHeightNotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldThumbnailsHeight))
+}
+
+// ThumbnailsIntervalEQ applies the EQ predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalEQ(v float64) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldThumbnailsInterval, v))
+}
+
+// ThumbnailsIntervalNEQ applies the NEQ predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalNEQ(v float64) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldThumbnailsInterval, v))
+}
+
+// ThumbnailsIntervalIn applies the In predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalIn(vs ...float64) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldThumbnailsInterval, vs...))
+}
+
+// ThumbnailsIntervalNotIn applies the NotIn predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalNotIn(vs ...float64) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldThumbnailsInterval, vs...))
+}
+
+// ThumbnailsIntervalGT applies the GT predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalGT(v float64) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldThumbnailsInterval, v))
+}
+
+// ThumbnailsIntervalGTE applies the GTE predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalGTE(v float64) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldThumbnailsInterval, v))
+}
+
+// ThumbnailsIntervalLT applies the LT predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalLT(v float64) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldThumbnailsInterval, v))
+}
+
+// ThumbnailsIntervalLTE applies the LTE predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalLTE(v float64) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldThumbnailsInterval, v))
+}
+
+// ThumbnailsIntervalIsNil applies the IsNil predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalIsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldThumbnailsInterval))
+}
+
+// ThumbnailsIntervalNotNil applies the NotNil predicate on the "thumbnails_interval" field.
+func ThumbnailsIntervalNotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldThumbnailsInterval))
+}
+
+// EosGeneratedThumbnailsEQ applies the EQ predicate on the "eos_generated_thumbnails" field.
+func EosGeneratedThumbnailsEQ(v bool) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldEosGeneratedThumbnails, v))
+}
+
+// EosGeneratedThumbnailsNEQ applies the NEQ predicate on the "eos_generated_thumbnails" field.
+func EosGeneratedThumbnailsNEQ(v bool) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldEosGeneratedThumbnails, v))
+}
+
+// EosGeneratedThumbnailsIsNil applies the IsNil predicate on the "eos_generated_thumbnails" field.
+func EosGeneratedThumbnailsIsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldEosGeneratedThumbnails))
+}
+
+// EosGeneratedThumbnailsNotNil applies the NotNil predicate on the "eos_generated_thumbnails" field.
+func EosGeneratedThumbnailsNotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldEosGeneratedThumbnails))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

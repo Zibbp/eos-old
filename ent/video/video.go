@@ -63,6 +63,16 @@ const (
 	FieldCaptionPath = "caption_path"
 	// FieldPath holds the string denoting the path field in the database.
 	FieldPath = "path"
+	// FieldThumbnailsPath holds the string denoting the thumbnails_path field in the database.
+	FieldThumbnailsPath = "thumbnails_path"
+	// FieldThumbnailsWidth holds the string denoting the thumbnails_width field in the database.
+	FieldThumbnailsWidth = "thumbnails_width"
+	// FieldThumbnailsHeight holds the string denoting the thumbnails_height field in the database.
+	FieldThumbnailsHeight = "thumbnails_height"
+	// FieldThumbnailsInterval holds the string denoting the thumbnails_interval field in the database.
+	FieldThumbnailsInterval = "thumbnails_interval"
+	// FieldEosGeneratedThumbnails holds the string denoting the eos_generated_thumbnails field in the database.
+	FieldEosGeneratedThumbnails = "eos_generated_thumbnails"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -127,6 +137,11 @@ var Columns = []string{
 	FieldJSONPath,
 	FieldCaptionPath,
 	FieldPath,
+	FieldThumbnailsPath,
+	FieldThumbnailsWidth,
+	FieldThumbnailsHeight,
+	FieldThumbnailsInterval,
+	FieldEosGeneratedThumbnails,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }

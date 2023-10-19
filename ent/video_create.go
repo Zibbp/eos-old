@@ -307,6 +307,76 @@ func (vc *VideoCreate) SetPath(s string) *VideoCreate {
 	return vc
 }
 
+// SetThumbnailsPath sets the "thumbnails_path" field.
+func (vc *VideoCreate) SetThumbnailsPath(s string) *VideoCreate {
+	vc.mutation.SetThumbnailsPath(s)
+	return vc
+}
+
+// SetNillableThumbnailsPath sets the "thumbnails_path" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailsPath(s *string) *VideoCreate {
+	if s != nil {
+		vc.SetThumbnailsPath(*s)
+	}
+	return vc
+}
+
+// SetThumbnailsWidth sets the "thumbnails_width" field.
+func (vc *VideoCreate) SetThumbnailsWidth(i int) *VideoCreate {
+	vc.mutation.SetThumbnailsWidth(i)
+	return vc
+}
+
+// SetNillableThumbnailsWidth sets the "thumbnails_width" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailsWidth(i *int) *VideoCreate {
+	if i != nil {
+		vc.SetThumbnailsWidth(*i)
+	}
+	return vc
+}
+
+// SetThumbnailsHeight sets the "thumbnails_height" field.
+func (vc *VideoCreate) SetThumbnailsHeight(i int) *VideoCreate {
+	vc.mutation.SetThumbnailsHeight(i)
+	return vc
+}
+
+// SetNillableThumbnailsHeight sets the "thumbnails_height" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailsHeight(i *int) *VideoCreate {
+	if i != nil {
+		vc.SetThumbnailsHeight(*i)
+	}
+	return vc
+}
+
+// SetThumbnailsInterval sets the "thumbnails_interval" field.
+func (vc *VideoCreate) SetThumbnailsInterval(f float64) *VideoCreate {
+	vc.mutation.SetThumbnailsInterval(f)
+	return vc
+}
+
+// SetNillableThumbnailsInterval sets the "thumbnails_interval" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailsInterval(f *float64) *VideoCreate {
+	if f != nil {
+		vc.SetThumbnailsInterval(*f)
+	}
+	return vc
+}
+
+// SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
+func (vc *VideoCreate) SetEosGeneratedThumbnails(b bool) *VideoCreate {
+	vc.mutation.SetEosGeneratedThumbnails(b)
+	return vc
+}
+
+// SetNillableEosGeneratedThumbnails sets the "eos_generated_thumbnails" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableEosGeneratedThumbnails(b *bool) *VideoCreate {
+	if b != nil {
+		vc.SetEosGeneratedThumbnails(*b)
+	}
+	return vc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (vc *VideoCreate) SetCreatedAt(t time.Time) *VideoCreate {
 	vc.mutation.SetCreatedAt(t)
@@ -612,6 +682,26 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 	if value, ok := vc.mutation.Path(); ok {
 		_spec.SetField(video.FieldPath, field.TypeString, value)
 		_node.Path = value
+	}
+	if value, ok := vc.mutation.ThumbnailsPath(); ok {
+		_spec.SetField(video.FieldThumbnailsPath, field.TypeString, value)
+		_node.ThumbnailsPath = value
+	}
+	if value, ok := vc.mutation.ThumbnailsWidth(); ok {
+		_spec.SetField(video.FieldThumbnailsWidth, field.TypeInt, value)
+		_node.ThumbnailsWidth = value
+	}
+	if value, ok := vc.mutation.ThumbnailsHeight(); ok {
+		_spec.SetField(video.FieldThumbnailsHeight, field.TypeInt, value)
+		_node.ThumbnailsHeight = value
+	}
+	if value, ok := vc.mutation.ThumbnailsInterval(); ok {
+		_spec.SetField(video.FieldThumbnailsInterval, field.TypeFloat64, value)
+		_node.ThumbnailsInterval = value
+	}
+	if value, ok := vc.mutation.EosGeneratedThumbnails(); ok {
+		_spec.SetField(video.FieldEosGeneratedThumbnails, field.TypeBool, value)
+		_node.EosGeneratedThumbnails = value
 	}
 	if value, ok := vc.mutation.CreatedAt(); ok {
 		_spec.SetField(video.FieldCreatedAt, field.TypeTime, value)

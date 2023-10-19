@@ -12,6 +12,7 @@ import (
 	entChannel "github.com/zibbp/eos/ent/channel"
 	entVideo "github.com/zibbp/eos/ent/video"
 	"github.com/zibbp/eos/internal/database"
+	"github.com/zibbp/eos/internal/utils"
 )
 
 type Service struct {
@@ -22,35 +23,39 @@ func NewService() *Service {
 }
 
 type Video struct {
-	ID            string    `json:"id"`
-	Title         string    `json:"title"`
-	Description   string    `json:"description"`
-	UploadDate    time.Time `json:"upload_date"`
-	Uploader      string    `json:"uploader"`
-	Duration      int64     `json:"duration"`
-	ViewCount     int64     `json:"view_count"`
-	LikeCount     int64     `json:"like_count"`
-	DislikeCount  int64     `json:"dislike_count"`
-	Format        string    `json:"format"`
-	Width         int64     `json:"width"`
-	Height        int64     `json:"height"`
-	Resolution    string    `json:"resolution"`
-	FPS           float64   `json:"fps"`
-	AudioCodec    string    `json:"audio_codec"`
-	VideoCodec    string    `json:"video_codec"`
-	ABR           float64   `json:"abr"`
-	VBR           float64   `json:"vbr"`
-	Epoch         int64     `json:"epoch"`
-	CommentCount  int64     `json:"comment_count"`
-	Tags          string    `json:"tags"`
-	Categories    string    `json:"categories"`
-	VideoPath     string    `json:"video_path"`
-	ThumbnailPath string    `json:"thumbnail_path"`
-	JSONPath      string    `json:"json_path"`
-	CaptionPath   string    `json:"caption_path"`
-	Path          string    `json:"path"`
-	CreatedAt     string    `json:"created_at"`
-	UpdatedAt     string    `json:"updated_at"`
+	ID                 string    `json:"id"`
+	Title              string    `json:"title"`
+	Description        string    `json:"description"`
+	UploadDate         time.Time `json:"upload_date"`
+	Uploader           string    `json:"uploader"`
+	Duration           int64     `json:"duration"`
+	ViewCount          int64     `json:"view_count"`
+	LikeCount          int64     `json:"like_count"`
+	DislikeCount       int64     `json:"dislike_count"`
+	Format             string    `json:"format"`
+	Width              int64     `json:"width"`
+	Height             int64     `json:"height"`
+	Resolution         string    `json:"resolution"`
+	FPS                float64   `json:"fps"`
+	AudioCodec         string    `json:"audio_codec"`
+	VideoCodec         string    `json:"video_codec"`
+	ABR                float64   `json:"abr"`
+	VBR                float64   `json:"vbr"`
+	Epoch              int64     `json:"epoch"`
+	CommentCount       int64     `json:"comment_count"`
+	Tags               string    `json:"tags"`
+	Categories         string    `json:"categories"`
+	VideoPath          string    `json:"video_path"`
+	ThumbnailPath      string    `json:"thumbnail_path"`
+	JSONPath           string    `json:"json_path"`
+	CaptionPath        string    `json:"caption_path"`
+	Path               string    `json:"path"`
+	ThumbnailsPath     string    `json:"thumbnails_path"`
+	ThumbnailsWidth    int       `json:"thumbnails_width"`
+	ThumbnailsHeight   int       `json:"thumbnails_height"`
+	ThumbnailsInterval float64   `json:"thumbnails_interval"`
+	CreatedAt          string    `json:"created_at"`
+	UpdatedAt          string    `json:"updated_at"`
 }
 
 type Chapter struct {
@@ -197,6 +202,17 @@ func (s *Service) GetVideosByChannelID(c echo.Context, channelID string) ([]*ent
 	return videos, nil
 }
 
+func (s *Service) GenerateThumbnailsVTT(c echo.Context, cdnURL, videoID string) (string, error) {
+	video, err := database.DB().Client.Video.Query().Where(entVideo.ID(videoID)).Only(c.Request().Context())
+	if err != nil {
+		return "", err
+	}
+
+	vtt := utils.GenerateVTT(fmt.Sprintf("%s/%s", cdnURL, video.ThumbnailsPath), video.ThumbnailsWidth, video.ThumbnailsHeight, int(video.Duration), video.ThumbnailsInterval)
+
+	return vtt, nil
+}
+
 func ScannerGetVideos() ([]*ent.Video, error) {
 	videos, err := database.DB().Client.Video.Query().All(context.Background())
 	if err != nil {
@@ -206,13 +222,13 @@ func ScannerGetVideos() ([]*ent.Video, error) {
 	return videos, nil
 }
 
-func ScannerCreateVideo(videoDto *Video, channelID string) error {
-	_, err := database.DB().Client.Video.Create().SetID(videoDto.ID).SetChannelID(channelID).SetTitle(videoDto.Title).SetDescription(videoDto.Description).SetUploadDate(videoDto.UploadDate).SetUploader(videoDto.Uploader).SetDuration(videoDto.Duration).SetViewCount(videoDto.ViewCount).SetLikeCount(videoDto.LikeCount).SetDislikeCount(videoDto.DislikeCount).SetFormat(videoDto.Format).SetWidth(videoDto.Width).SetHeight(videoDto.Height).SetResolution(videoDto.Resolution).SetFps(videoDto.FPS).SetAudioCodec(videoDto.AudioCodec).SetVideoCodec(videoDto.VideoCodec).SetAbr(videoDto.ABR).SetVbr(videoDto.VBR).SetEpoch(videoDto.Epoch).SetCommentCount(videoDto.CommentCount).SetTags(videoDto.Tags).SetCategories(videoDto.Categories).SetVideoPath(videoDto.VideoPath).SetThumbnailPath(videoDto.ThumbnailPath).SetJSONPath(videoDto.JSONPath).SetCaptionPath(videoDto.CaptionPath).SetPath(videoDto.Path).Save(context.Background())
+func ScannerCreateVideo(videoDto *Video, channelID string) (*ent.Video, error) {
+	vid, err := database.DB().Client.Video.Create().SetID(videoDto.ID).SetChannelID(channelID).SetTitle(videoDto.Title).SetDescription(videoDto.Description).SetUploadDate(videoDto.UploadDate).SetUploader(videoDto.Uploader).SetDuration(videoDto.Duration).SetViewCount(videoDto.ViewCount).SetLikeCount(videoDto.LikeCount).SetDislikeCount(videoDto.DislikeCount).SetFormat(videoDto.Format).SetWidth(videoDto.Width).SetHeight(videoDto.Height).SetResolution(videoDto.Resolution).SetFps(videoDto.FPS).SetAudioCodec(videoDto.AudioCodec).SetVideoCodec(videoDto.VideoCodec).SetAbr(videoDto.ABR).SetVbr(videoDto.VBR).SetEpoch(videoDto.Epoch).SetCommentCount(videoDto.CommentCount).SetTags(videoDto.Tags).SetCategories(videoDto.Categories).SetVideoPath(videoDto.VideoPath).SetThumbnailPath(videoDto.ThumbnailPath).SetJSONPath(videoDto.JSONPath).SetCaptionPath(videoDto.CaptionPath).SetPath(videoDto.Path).Save(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to create video: %v", err)
+		return nil, fmt.Errorf("failed to create video: %v", err)
 	}
 
-	return nil
+	return vid, nil
 }
 
 func ScannerCreateChapter(chapterDto *Chapter, videoID string) error {
@@ -222,4 +238,13 @@ func ScannerCreateChapter(chapterDto *Chapter, videoID string) error {
 	}
 
 	return nil
+}
+
+func ScannerGetVideo(videoID string) (*ent.Video, error) {
+	video, err := database.DB().Client.Video.Query().Where(entVideo.ID(videoID)).Only(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get video: %v", err)
+	}
+
+	return video, nil
 }

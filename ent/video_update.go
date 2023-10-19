@@ -488,6 +488,127 @@ func (vu *VideoUpdate) SetPath(s string) *VideoUpdate {
 	return vu
 }
 
+// SetThumbnailsPath sets the "thumbnails_path" field.
+func (vu *VideoUpdate) SetThumbnailsPath(s string) *VideoUpdate {
+	vu.mutation.SetThumbnailsPath(s)
+	return vu
+}
+
+// SetNillableThumbnailsPath sets the "thumbnails_path" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableThumbnailsPath(s *string) *VideoUpdate {
+	if s != nil {
+		vu.SetThumbnailsPath(*s)
+	}
+	return vu
+}
+
+// ClearThumbnailsPath clears the value of the "thumbnails_path" field.
+func (vu *VideoUpdate) ClearThumbnailsPath() *VideoUpdate {
+	vu.mutation.ClearThumbnailsPath()
+	return vu
+}
+
+// SetThumbnailsWidth sets the "thumbnails_width" field.
+func (vu *VideoUpdate) SetThumbnailsWidth(i int) *VideoUpdate {
+	vu.mutation.ResetThumbnailsWidth()
+	vu.mutation.SetThumbnailsWidth(i)
+	return vu
+}
+
+// SetNillableThumbnailsWidth sets the "thumbnails_width" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableThumbnailsWidth(i *int) *VideoUpdate {
+	if i != nil {
+		vu.SetThumbnailsWidth(*i)
+	}
+	return vu
+}
+
+// AddThumbnailsWidth adds i to the "thumbnails_width" field.
+func (vu *VideoUpdate) AddThumbnailsWidth(i int) *VideoUpdate {
+	vu.mutation.AddThumbnailsWidth(i)
+	return vu
+}
+
+// ClearThumbnailsWidth clears the value of the "thumbnails_width" field.
+func (vu *VideoUpdate) ClearThumbnailsWidth() *VideoUpdate {
+	vu.mutation.ClearThumbnailsWidth()
+	return vu
+}
+
+// SetThumbnailsHeight sets the "thumbnails_height" field.
+func (vu *VideoUpdate) SetThumbnailsHeight(i int) *VideoUpdate {
+	vu.mutation.ResetThumbnailsHeight()
+	vu.mutation.SetThumbnailsHeight(i)
+	return vu
+}
+
+// SetNillableThumbnailsHeight sets the "thumbnails_height" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableThumbnailsHeight(i *int) *VideoUpdate {
+	if i != nil {
+		vu.SetThumbnailsHeight(*i)
+	}
+	return vu
+}
+
+// AddThumbnailsHeight adds i to the "thumbnails_height" field.
+func (vu *VideoUpdate) AddThumbnailsHeight(i int) *VideoUpdate {
+	vu.mutation.AddThumbnailsHeight(i)
+	return vu
+}
+
+// ClearThumbnailsHeight clears the value of the "thumbnails_height" field.
+func (vu *VideoUpdate) ClearThumbnailsHeight() *VideoUpdate {
+	vu.mutation.ClearThumbnailsHeight()
+	return vu
+}
+
+// SetThumbnailsInterval sets the "thumbnails_interval" field.
+func (vu *VideoUpdate) SetThumbnailsInterval(f float64) *VideoUpdate {
+	vu.mutation.ResetThumbnailsInterval()
+	vu.mutation.SetThumbnailsInterval(f)
+	return vu
+}
+
+// SetNillableThumbnailsInterval sets the "thumbnails_interval" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableThumbnailsInterval(f *float64) *VideoUpdate {
+	if f != nil {
+		vu.SetThumbnailsInterval(*f)
+	}
+	return vu
+}
+
+// AddThumbnailsInterval adds f to the "thumbnails_interval" field.
+func (vu *VideoUpdate) AddThumbnailsInterval(f float64) *VideoUpdate {
+	vu.mutation.AddThumbnailsInterval(f)
+	return vu
+}
+
+// ClearThumbnailsInterval clears the value of the "thumbnails_interval" field.
+func (vu *VideoUpdate) ClearThumbnailsInterval() *VideoUpdate {
+	vu.mutation.ClearThumbnailsInterval()
+	return vu
+}
+
+// SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
+func (vu *VideoUpdate) SetEosGeneratedThumbnails(b bool) *VideoUpdate {
+	vu.mutation.SetEosGeneratedThumbnails(b)
+	return vu
+}
+
+// SetNillableEosGeneratedThumbnails sets the "eos_generated_thumbnails" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableEosGeneratedThumbnails(b *bool) *VideoUpdate {
+	if b != nil {
+		vu.SetEosGeneratedThumbnails(*b)
+	}
+	return vu
+}
+
+// ClearEosGeneratedThumbnails clears the value of the "eos_generated_thumbnails" field.
+func (vu *VideoUpdate) ClearEosGeneratedThumbnails() *VideoUpdate {
+	vu.mutation.ClearEosGeneratedThumbnails()
+	return vu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (vu *VideoUpdate) SetUpdatedAt(t time.Time) *VideoUpdate {
 	vu.mutation.SetUpdatedAt(t)
@@ -811,6 +932,45 @@ func (vu *VideoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := vu.mutation.Path(); ok {
 		_spec.SetField(video.FieldPath, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.ThumbnailsPath(); ok {
+		_spec.SetField(video.FieldThumbnailsPath, field.TypeString, value)
+	}
+	if vu.mutation.ThumbnailsPathCleared() {
+		_spec.ClearField(video.FieldThumbnailsPath, field.TypeString)
+	}
+	if value, ok := vu.mutation.ThumbnailsWidth(); ok {
+		_spec.SetField(video.FieldThumbnailsWidth, field.TypeInt, value)
+	}
+	if value, ok := vu.mutation.AddedThumbnailsWidth(); ok {
+		_spec.AddField(video.FieldThumbnailsWidth, field.TypeInt, value)
+	}
+	if vu.mutation.ThumbnailsWidthCleared() {
+		_spec.ClearField(video.FieldThumbnailsWidth, field.TypeInt)
+	}
+	if value, ok := vu.mutation.ThumbnailsHeight(); ok {
+		_spec.SetField(video.FieldThumbnailsHeight, field.TypeInt, value)
+	}
+	if value, ok := vu.mutation.AddedThumbnailsHeight(); ok {
+		_spec.AddField(video.FieldThumbnailsHeight, field.TypeInt, value)
+	}
+	if vu.mutation.ThumbnailsHeightCleared() {
+		_spec.ClearField(video.FieldThumbnailsHeight, field.TypeInt)
+	}
+	if value, ok := vu.mutation.ThumbnailsInterval(); ok {
+		_spec.SetField(video.FieldThumbnailsInterval, field.TypeFloat64, value)
+	}
+	if value, ok := vu.mutation.AddedThumbnailsInterval(); ok {
+		_spec.AddField(video.FieldThumbnailsInterval, field.TypeFloat64, value)
+	}
+	if vu.mutation.ThumbnailsIntervalCleared() {
+		_spec.ClearField(video.FieldThumbnailsInterval, field.TypeFloat64)
+	}
+	if value, ok := vu.mutation.EosGeneratedThumbnails(); ok {
+		_spec.SetField(video.FieldEosGeneratedThumbnails, field.TypeBool, value)
+	}
+	if vu.mutation.EosGeneratedThumbnailsCleared() {
+		_spec.ClearField(video.FieldEosGeneratedThumbnails, field.TypeBool)
 	}
 	if value, ok := vu.mutation.UpdatedAt(); ok {
 		_spec.SetField(video.FieldUpdatedAt, field.TypeTime, value)
@@ -1435,6 +1595,127 @@ func (vuo *VideoUpdateOne) SetPath(s string) *VideoUpdateOne {
 	return vuo
 }
 
+// SetThumbnailsPath sets the "thumbnails_path" field.
+func (vuo *VideoUpdateOne) SetThumbnailsPath(s string) *VideoUpdateOne {
+	vuo.mutation.SetThumbnailsPath(s)
+	return vuo
+}
+
+// SetNillableThumbnailsPath sets the "thumbnails_path" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableThumbnailsPath(s *string) *VideoUpdateOne {
+	if s != nil {
+		vuo.SetThumbnailsPath(*s)
+	}
+	return vuo
+}
+
+// ClearThumbnailsPath clears the value of the "thumbnails_path" field.
+func (vuo *VideoUpdateOne) ClearThumbnailsPath() *VideoUpdateOne {
+	vuo.mutation.ClearThumbnailsPath()
+	return vuo
+}
+
+// SetThumbnailsWidth sets the "thumbnails_width" field.
+func (vuo *VideoUpdateOne) SetThumbnailsWidth(i int) *VideoUpdateOne {
+	vuo.mutation.ResetThumbnailsWidth()
+	vuo.mutation.SetThumbnailsWidth(i)
+	return vuo
+}
+
+// SetNillableThumbnailsWidth sets the "thumbnails_width" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableThumbnailsWidth(i *int) *VideoUpdateOne {
+	if i != nil {
+		vuo.SetThumbnailsWidth(*i)
+	}
+	return vuo
+}
+
+// AddThumbnailsWidth adds i to the "thumbnails_width" field.
+func (vuo *VideoUpdateOne) AddThumbnailsWidth(i int) *VideoUpdateOne {
+	vuo.mutation.AddThumbnailsWidth(i)
+	return vuo
+}
+
+// ClearThumbnailsWidth clears the value of the "thumbnails_width" field.
+func (vuo *VideoUpdateOne) ClearThumbnailsWidth() *VideoUpdateOne {
+	vuo.mutation.ClearThumbnailsWidth()
+	return vuo
+}
+
+// SetThumbnailsHeight sets the "thumbnails_height" field.
+func (vuo *VideoUpdateOne) SetThumbnailsHeight(i int) *VideoUpdateOne {
+	vuo.mutation.ResetThumbnailsHeight()
+	vuo.mutation.SetThumbnailsHeight(i)
+	return vuo
+}
+
+// SetNillableThumbnailsHeight sets the "thumbnails_height" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableThumbnailsHeight(i *int) *VideoUpdateOne {
+	if i != nil {
+		vuo.SetThumbnailsHeight(*i)
+	}
+	return vuo
+}
+
+// AddThumbnailsHeight adds i to the "thumbnails_height" field.
+func (vuo *VideoUpdateOne) AddThumbnailsHeight(i int) *VideoUpdateOne {
+	vuo.mutation.AddThumbnailsHeight(i)
+	return vuo
+}
+
+// ClearThumbnailsHeight clears the value of the "thumbnails_height" field.
+func (vuo *VideoUpdateOne) ClearThumbnailsHeight() *VideoUpdateOne {
+	vuo.mutation.ClearThumbnailsHeight()
+	return vuo
+}
+
+// SetThumbnailsInterval sets the "thumbnails_interval" field.
+func (vuo *VideoUpdateOne) SetThumbnailsInterval(f float64) *VideoUpdateOne {
+	vuo.mutation.ResetThumbnailsInterval()
+	vuo.mutation.SetThumbnailsInterval(f)
+	return vuo
+}
+
+// SetNillableThumbnailsInterval sets the "thumbnails_interval" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableThumbnailsInterval(f *float64) *VideoUpdateOne {
+	if f != nil {
+		vuo.SetThumbnailsInterval(*f)
+	}
+	return vuo
+}
+
+// AddThumbnailsInterval adds f to the "thumbnails_interval" field.
+func (vuo *VideoUpdateOne) AddThumbnailsInterval(f float64) *VideoUpdateOne {
+	vuo.mutation.AddThumbnailsInterval(f)
+	return vuo
+}
+
+// ClearThumbnailsInterval clears the value of the "thumbnails_interval" field.
+func (vuo *VideoUpdateOne) ClearThumbnailsInterval() *VideoUpdateOne {
+	vuo.mutation.ClearThumbnailsInterval()
+	return vuo
+}
+
+// SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
+func (vuo *VideoUpdateOne) SetEosGeneratedThumbnails(b bool) *VideoUpdateOne {
+	vuo.mutation.SetEosGeneratedThumbnails(b)
+	return vuo
+}
+
+// SetNillableEosGeneratedThumbnails sets the "eos_generated_thumbnails" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableEosGeneratedThumbnails(b *bool) *VideoUpdateOne {
+	if b != nil {
+		vuo.SetEosGeneratedThumbnails(*b)
+	}
+	return vuo
+}
+
+// ClearEosGeneratedThumbnails clears the value of the "eos_generated_thumbnails" field.
+func (vuo *VideoUpdateOne) ClearEosGeneratedThumbnails() *VideoUpdateOne {
+	vuo.mutation.ClearEosGeneratedThumbnails()
+	return vuo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (vuo *VideoUpdateOne) SetUpdatedAt(t time.Time) *VideoUpdateOne {
 	vuo.mutation.SetUpdatedAt(t)
@@ -1782,6 +2063,45 @@ func (vuo *VideoUpdateOne) sqlSave(ctx context.Context) (_node *Video, err error
 	}
 	if value, ok := vuo.mutation.Path(); ok {
 		_spec.SetField(video.FieldPath, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.ThumbnailsPath(); ok {
+		_spec.SetField(video.FieldThumbnailsPath, field.TypeString, value)
+	}
+	if vuo.mutation.ThumbnailsPathCleared() {
+		_spec.ClearField(video.FieldThumbnailsPath, field.TypeString)
+	}
+	if value, ok := vuo.mutation.ThumbnailsWidth(); ok {
+		_spec.SetField(video.FieldThumbnailsWidth, field.TypeInt, value)
+	}
+	if value, ok := vuo.mutation.AddedThumbnailsWidth(); ok {
+		_spec.AddField(video.FieldThumbnailsWidth, field.TypeInt, value)
+	}
+	if vuo.mutation.ThumbnailsWidthCleared() {
+		_spec.ClearField(video.FieldThumbnailsWidth, field.TypeInt)
+	}
+	if value, ok := vuo.mutation.ThumbnailsHeight(); ok {
+		_spec.SetField(video.FieldThumbnailsHeight, field.TypeInt, value)
+	}
+	if value, ok := vuo.mutation.AddedThumbnailsHeight(); ok {
+		_spec.AddField(video.FieldThumbnailsHeight, field.TypeInt, value)
+	}
+	if vuo.mutation.ThumbnailsHeightCleared() {
+		_spec.ClearField(video.FieldThumbnailsHeight, field.TypeInt)
+	}
+	if value, ok := vuo.mutation.ThumbnailsInterval(); ok {
+		_spec.SetField(video.FieldThumbnailsInterval, field.TypeFloat64, value)
+	}
+	if value, ok := vuo.mutation.AddedThumbnailsInterval(); ok {
+		_spec.AddField(video.FieldThumbnailsInterval, field.TypeFloat64, value)
+	}
+	if vuo.mutation.ThumbnailsIntervalCleared() {
+		_spec.ClearField(video.FieldThumbnailsInterval, field.TypeFloat64)
+	}
+	if value, ok := vuo.mutation.EosGeneratedThumbnails(); ok {
+		_spec.SetField(video.FieldEosGeneratedThumbnails, field.TypeBool, value)
+	}
+	if vuo.mutation.EosGeneratedThumbnailsCleared() {
+		_spec.ClearField(video.FieldEosGeneratedThumbnails, field.TypeBool)
 	}
 	if value, ok := vuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(video.FieldUpdatedAt, field.TypeTime, value)
