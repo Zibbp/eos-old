@@ -305,7 +305,7 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 	}
 
 	// create video
-	dbVideo, err := video.ScannerCreateVideo(videoDto, importVideo.ChannelID)
+	_, err = video.ScannerCreateVideo(videoDto, importVideo.ChannelID)
 	if err != nil {
 		log.Error().Err(err).Str("task", TypeVideoProcess).Msg("failed to create video")
 		return err
@@ -346,7 +346,7 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 				AuthorIsUploader: videoComment.AuthorIsUploader,
 				Parent:           videoComment.Parent,
 			}
-			// parse epoch to time]
+			// parse epoch to time
 			parsedTime := time.Unix(videoComment.Timestamp, 0)
 			parsedComment.Timestamp = parsedTime
 			err = comment.ScannerCreateComment(&parsedComment, importVideo.ID)
@@ -359,64 +359,64 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 	}
 
 	// vtt thumbnails
-	for _, format := range importVideo.Formats {
-		if format.FormatID == "sb0" {
-			// create tmp dir
-			err = utils.CreateDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
-			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to create directory: %s", importVideo.ID)
-				return err
-			}
+	// for _, format := range importVideo.Formats {
+	// 	if format.FormatID == "sb0" {
+	// 		// create tmp dir
+	// 		err = utils.CreateDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
+	// 		if err != nil {
+	// 			log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to create directory: %s", importVideo.ID)
+	// 			return err
+	// 		}
 
-			for i, fragment := range format.Fragments {
-				err = utils.DownloadFile(fragment.URL, fmt.Sprintf("/tmp/%s/thumbnail%04d.jpg", importVideo.ID, i))
-				if err != nil {
-					log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to download thumbnail: %s", fragment.URL)
+	// 		for i, fragment := range format.Fragments {
+	// 			err = utils.DownloadFile(fragment.URL, fmt.Sprintf("/tmp/%s/thumbnail%04d.jpg", importVideo.ID, i))
+	// 			if err != nil {
+	// 				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to download thumbnail: %s", fragment.URL)
 
-					// allow this to fail and succeed job
-					err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
-					if err != nil {
-						log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to remove tmp directory: %s", importVideo.ID)
-						continue
-					}
-					return nil
-				}
-			}
+	// 				// allow this to fail and succeed job
+	// 				err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
+	// 				if err != nil {
+	// 					log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to remove tmp directory: %s", importVideo.ID)
+	// 					continue
+	// 				}
+	// 				return nil
+	// 			}
+	// 		}
 
-			// generate storyboard
-			err = utils.GenerateStoryboardImage(fmt.Sprintf("/tmp/%s/thumbnail*.jpg", importVideo.ID), fmt.Sprintf("/tmp/%s/thumbnails.jpg", importVideo.ID))
-			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to generate storyboard for video: %s", importVideo.ID)
-				return err
-			}
+	// 		// generate storyboard
+	// 		err = utils.GenerateStoryboardImage(fmt.Sprintf("/tmp/%s/thumbnail*.jpg", importVideo.ID), fmt.Sprintf("/tmp/%s/thumbnails.jpg", importVideo.ID))
+	// 		if err != nil {
+	// 			log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to generate storyboard for video: %s", importVideo.ID)
+	// 			return err
+	// 		}
 
-			// move image to video directory
-			err = utils.MoveFile(fmt.Sprintf("/tmp/%s/thumbnails.jpg", importVideo.ID), fmt.Sprintf("%s/thumbnails.jpg", importVideo.Path))
-			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to move storyboard for video: %s", importVideo.ID)
-				return err
-			}
+	// 		// move image to video directory
+	// 		err = utils.MoveFile(fmt.Sprintf("/tmp/%s/thumbnails.jpg", importVideo.ID), fmt.Sprintf("%s/thumbnails.jpg", importVideo.Path))
+	// 		if err != nil {
+	// 			log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to move storyboard for video: %s", importVideo.ID)
+	// 			return err
+	// 		}
 
-			// remove tmp directory
-			err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
-			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to remove tmp directory: %s", importVideo.ID)
-				return err
-			}
+	// 		// remove tmp directory
+	// 		err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", importVideo.ID))
+	// 		if err != nil {
+	// 			log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to remove tmp directory: %s", importVideo.ID)
+	// 			return err
+	// 		}
 
-			// calculate interval of thumbnails
-			interval := format.Fragments[0].Duration / 25
+	// 		// calculate interval of thumbnails
+	// 		interval := format.Fragments[0].Duration / 25
 
-			// update video
-			_, err = dbVideo.Update().SetThumbnailsPath(fmt.Sprintf("%s/%s", videoDirectoryPath, "thumbnails.jpg")).SetThumbnailsWidth(int(*format.Width)).SetThumbnailsHeight(int(*format.Height)).SetThumbnailsInterval(interval).Save(ctx)
-			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to update video %s", importVideo.ID)
-				return err
-			}
+	// 		// update video
+	// 		_, err = dbVideo.Update().SetThumbnailsPath(fmt.Sprintf("%s/%s", videoDirectoryPath, "thumbnails.jpg")).SetThumbnailsWidth(int(*format.Width)).SetThumbnailsHeight(int(*format.Height)).SetThumbnailsInterval(interval).Save(ctx)
+	// 		if err != nil {
+	// 			log.Error().Err(err).Str("task", TypeVideoProcess).Msgf("failed to update video %s", importVideo.ID)
+	// 			return err
+	// 		}
 
-			log.Info().Str("task", TypeVideoProcess).Msgf("generated thumbnails for video %s", importVideo.ID)
-		}
-	}
+	// 		log.Info().Str("task", TypeVideoProcess).Msgf("generated thumbnails for video %s", importVideo.ID)
+	// 	}
+	// }
 
 	return nil
 }
