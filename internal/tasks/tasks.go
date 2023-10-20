@@ -229,6 +229,11 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 
 	}
 
+	if importVideo.Type == "playlist" {
+		log.Debug().Str("task", TypeVideoProcess).Msgf("skipping %s as it is a playlist", p.VideoName)
+		return nil
+	}
+
 	// set path
 	importVideo.Path = fmt.Sprintf("%s/%s", p.ChannelDirectoryPath, p.VideoName)
 

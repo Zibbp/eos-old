@@ -42,6 +42,7 @@ type VideoInfo struct {
 	Path           string          `json:"path"`
 	Comments       []Comment       `json:"comments"`
 	Chapters       []video.Chapter `json:"chapters"`
+	Type           string          `json:"_type"`
 }
 
 type Comment struct {
