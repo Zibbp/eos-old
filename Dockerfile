@@ -14,6 +14,15 @@ COPY --from=build-stage-01 /app/eos-api .
 
 COPY --from=build-stage-01 /app/eos-worker .
 
-RUN apt update && apt install ffmpeg imagemagick -y
+RUN apt update && apt install curl imagemagick -y
+
+# jellyfin's ffmpeg has better support for hardware acceleration
+RUN curl -L -o ffmpeg.deb https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v6.0-7/jellyfin-ffmpeg6_6.0-7-bookworm_amd64.deb
+
+RUN apt install --fix-broken ./ffmpeg.deb -y
+
+RUN rm ffmpeg.deb
+
+RUN ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg && ln -s /usr/lib/jellyfin-ffmpeg/ffprobe /usr/local/bin/ffprobe
 
 CMD ["./eos-api"]
