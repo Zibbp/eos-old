@@ -29,4 +29,6 @@ RUN rm ffmpeg.deb
 
 RUN ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg && ln -s /usr/lib/jellyfin-ffmpeg/ffprobe /usr/local/bin/ffprobe
 
+RUN chmod -R 777 /usr/local/share/fonts
+
 CMD ["./eos-api"]
