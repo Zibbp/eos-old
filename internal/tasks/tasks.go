@@ -363,5 +363,20 @@ func HandleVideoProcessTask(ctx context.Context, t *asynq.Task) error {
 		log.Info().Str("task", TypeVideoProcess).Msgf("imported %d comments for video %s", len(importVideo.Comments), importVideo.ID)
 	}
 
+	// create task to download thumbnails
+	downloadThumbnailsTask, err := NewVideoDownloadThumbnailsTask(importVideo.ID)
+	if err != nil {
+		log.Error().Err(err).Str("task", TypeVideoProcess).Msg("failed to create download thumbnails task")
+		return err
+	}
+
+	downloadThumbnailsTaskInfo, err := redis.GetAsynqClient().Client.Enqueue(downloadThumbnailsTask, asynq.Queue(string(utils.ThumbnailGeneratorQueue)), asynq.Unique(time.Hour))
+	if err != nil {
+		log.Error().Err(err).Str("task", TypeVideoProcess).Msg("failed to enqueue download thumbnails task")
+		return err
+	}
+
+	log.Info().Str("task", TypeVideoProcess).Msgf("enqueued task %s for video %s", downloadThumbnailsTaskInfo.Type, importVideo.ID)
+
 	return nil
 }
