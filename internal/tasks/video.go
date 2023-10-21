@@ -255,25 +255,25 @@ func HandleVideoDownloadThumbnailsTask(ctx context.Context, t *asynq.Task) error
 		if format.FormatID == "sb0" {
 			// skip if there are no row or columns
 			if format.Rows == nil || format.Columns == nil || format.FPS == nil {
-				log.Info().Str("task", TypeVideoDownloadThumbnails).Msgf("skipping video %s, no rows, columns, or fps", info.ID)
+				log.Info().Str("task", TypeVideoDownloadThumbnails).Msgf("skipping video %s, no rows, columns, or fps", dbVideo.ID)
 				return nil
 			}
 			// create tmp dir
-			err = utils.CreateDirectory(fmt.Sprintf("/tmp/%s", info.ID))
+			err = utils.CreateDirectory(fmt.Sprintf("/tmp/%s", dbVideo.ID))
 			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to create directory: %s", info.ID)
+				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to create directory: %s", dbVideo.ID)
 				return err
 			}
 
 			for i, fragment := range format.Fragments {
-				err = utils.DownloadFile(fragment.URL, fmt.Sprintf("/tmp/%s/thumbnail%04d.jpg", info.ID, i))
+				err = utils.DownloadFile(fragment.URL, fmt.Sprintf("/tmp/%s/thumbnail%04d.jpg", dbVideo.ID, i))
 				if err != nil {
 					log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to download thumbnail: %s", fragment.URL)
 
 					// allow this to fail and succeed job
-					err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", info.ID))
+					err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", dbVideo.ID))
 					if err != nil {
-						log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to remove tmp directory: %s", info.ID)
+						log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to remove tmp directory: %s", dbVideo.ID)
 						continue
 					}
 					return nil
@@ -287,23 +287,23 @@ func HandleVideoDownloadThumbnailsTask(ctx context.Context, t *asynq.Task) error
 				"-tile",
 				"1x",
 			}
-			err = utils.GenerateStoryboardImage(args, fmt.Sprintf("/tmp/%s/thumbnail*.jpg", info.ID), fmt.Sprintf("/tmp/%s/thumbnails.jpg", info.ID))
+			err = utils.GenerateStoryboardImage(args, fmt.Sprintf("/tmp/%s/thumbnail*.jpg", dbVideo.ID), fmt.Sprintf("/tmp/%s/thumbnails.jpg", dbVideo.ID))
 			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to generate storyboard for video: %s", info.ID)
+				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to generate storyboard for video: %s", dbVideo.ID)
 				return err
 			}
 
 			// move image to video directory
-			err = utils.MoveFile(fmt.Sprintf("/tmp/%s/thumbnails.jpg", info.ID), fmt.Sprintf("%s/thumbnails.jpg", info.Path))
+			err = utils.MoveFile(fmt.Sprintf("/tmp/%s/thumbnails.jpg", dbVideo.ID), fmt.Sprintf("%s/thumbnails.jpg", dbVideo.Path))
 			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to move storyboard for video: %s", info.ID)
+				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to move storyboard for video: %s", dbVideo.ID)
 				return err
 			}
 
 			// remove tmp directory
-			err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", info.ID))
+			err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", dbVideo.ID))
 			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to remove tmp directory: %s", info.ID)
+				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to remove tmp directory: %s", dbVideo.ID)
 				return err
 			}
 
@@ -313,11 +313,11 @@ func HandleVideoDownloadThumbnailsTask(ctx context.Context, t *asynq.Task) error
 			// update video
 			_, err = dbVideo.Update().SetThumbnailsPath(fmt.Sprintf("%s/%s", dbVideo.Path, "thumbnails.jpg")).SetThumbnailsWidth(int(*format.Width)).SetThumbnailsHeight(int(*format.Height)).SetThumbnailsInterval(interval).SetThumbnailsRows(int(*format.Rows)).Save(ctx)
 			if err != nil {
-				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to update video %s", info.ID)
+				log.Error().Err(err).Str("task", TypeVideoDownloadThumbnails).Msgf("failed to update video %s", dbVideo.ID)
 				return err
 			}
 
-			log.Info().Str("task", TypeVideoDownloadThumbnails).Msgf("generated thumbnails for video %s", info.ID)
+			log.Info().Str("task", TypeVideoDownloadThumbnails).Msgf("generated thumbnails for video %s", dbVideo.ID)
 		}
 	}
 
