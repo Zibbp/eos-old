@@ -363,6 +363,20 @@ func (vc *VideoCreate) SetNillableThumbnailsInterval(f *float64) *VideoCreate {
 	return vc
 }
 
+// SetThumbnailsRows sets the "thumbnails_rows" field.
+func (vc *VideoCreate) SetThumbnailsRows(i int) *VideoCreate {
+	vc.mutation.SetThumbnailsRows(i)
+	return vc
+}
+
+// SetNillableThumbnailsRows sets the "thumbnails_rows" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableThumbnailsRows(i *int) *VideoCreate {
+	if i != nil {
+		vc.SetThumbnailsRows(*i)
+	}
+	return vc
+}
+
 // SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
 func (vc *VideoCreate) SetEosGeneratedThumbnails(b bool) *VideoCreate {
 	vc.mutation.SetEosGeneratedThumbnails(b)
@@ -698,6 +712,10 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 	if value, ok := vc.mutation.ThumbnailsInterval(); ok {
 		_spec.SetField(video.FieldThumbnailsInterval, field.TypeFloat64, value)
 		_node.ThumbnailsInterval = value
+	}
+	if value, ok := vc.mutation.ThumbnailsRows(); ok {
+		_spec.SetField(video.FieldThumbnailsRows, field.TypeInt, value)
+		_node.ThumbnailsRows = value
 	}
 	if value, ok := vc.mutation.EosGeneratedThumbnails(); ok {
 		_spec.SetField(video.FieldEosGeneratedThumbnails, field.TypeBool, value)

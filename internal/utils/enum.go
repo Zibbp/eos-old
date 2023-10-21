@@ -14,6 +14,19 @@ func (ScanType) Values() (kinds []string) {
 	return
 }
 
+type VideoProcessTask string
+
+const (
+	DownloadThumbnails VideoProcessTask = "download_thumbnails"
+)
+
+func (VideoProcessTask) Values() (kinds []string) {
+	for _, s := range []VideoProcessTask{DownloadThumbnails} {
+		kinds = append(kinds, string(s))
+	}
+	return
+}
+
 type AsynqQueue string
 
 const (

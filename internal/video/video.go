@@ -208,7 +208,7 @@ func (s *Service) GenerateThumbnailsVTT(c echo.Context, cdnURL, videoID string) 
 		return "", err
 	}
 
-	vtt := utils.GenerateVTT(fmt.Sprintf("%s/%s", cdnURL, video.ThumbnailsPath), video.ThumbnailsWidth, video.ThumbnailsHeight, int(video.Duration), video.ThumbnailsInterval)
+	vtt := utils.GenerateVTT(fmt.Sprintf("%s/%s", cdnURL, video.ThumbnailsPath), video.ThumbnailsWidth, video.ThumbnailsHeight, int(video.Duration), video.ThumbnailsInterval, video.ThumbnailsRows)
 
 	return vtt, nil
 }

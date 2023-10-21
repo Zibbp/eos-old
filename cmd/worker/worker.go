@@ -59,6 +59,8 @@ func main() {
 	mux.HandleFunc("video:scan_channel", tasks.HandleVideoScanChannelTask)
 	mux.HandleFunc("video:process", tasks.HandleVideoProcessTask)
 	mux.HandleFunc("video:generate_thumbnails", tasks.HandleVideoGenerateThumbnailsTask)
+	mux.HandleFunc("video:start_process", tasks.HandleVideoStartProcessTask)
+	mux.HandleFunc("video:download_thumbnails", tasks.HandleVideoDownloadThumbnailsTask)
 
 	if err := srv.Run(mux); err != nil {
 		log.Fatal().Err(err).Msg("error running server")

@@ -107,6 +107,7 @@ var (
 		{Name: "thumbnails_width", Type: field.TypeInt, Nullable: true},
 		{Name: "thumbnails_height", Type: field.TypeInt, Nullable: true},
 		{Name: "thumbnails_interval", Type: field.TypeFloat64, Nullable: true},
+		{Name: "thumbnails_rows", Type: field.TypeInt, Nullable: true},
 		{Name: "eos_generated_thumbnails", Type: field.TypeBool, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -120,7 +121,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "videos_channels_videos",
-				Columns:    []*schema.Column{VideosColumns[34]},
+				Columns:    []*schema.Column{VideosColumns[35]},
 				RefColumns: []*schema.Column{ChannelsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

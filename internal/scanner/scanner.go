@@ -1,6 +1,8 @@
 package scanner
 
 import (
+	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/zibbp/eos/internal/video"
@@ -74,4 +76,19 @@ type Format struct {
 type Fragment struct {
 	URL      string  `json:"url"`
 	Duration float64 `json:"duration"`
+}
+
+func GetVideoInfo(infoPath string) (*VideoInfo, error) {
+	var info VideoInfo
+	// parse info json file
+	jsonData, err := os.ReadFile(infoPath)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(jsonData, &info)
+	if err != nil {
+		return nil, err
+	}
+
+	return &info, nil
 }

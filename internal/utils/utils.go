@@ -137,9 +137,9 @@ func DownloadFile(url string, filePath string) error {
 	return err
 }
 
-func GenerateVTT(baseURL string, width, height, duration int, interval float64) string {
+func GenerateVTT(baseURL string, width, height, duration int, interval float64, rows int) string {
 	vttContent := "WEBVTT\n\n"
-	tilesAcross := 5
+	tilesAcross := rows
 	numThumbnails := int(float64(duration) / interval)
 	for i := 0; i < numThumbnails; i++ {
 		x := (i % tilesAcross) * width

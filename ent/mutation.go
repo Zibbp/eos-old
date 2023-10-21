@@ -2263,6 +2263,8 @@ type VideoMutation struct {
 	addthumbnails_height     *int
 	thumbnails_interval      *float64
 	addthumbnails_interval   *float64
+	thumbnails_rows          *int
+	addthumbnails_rows       *int
 	eos_generated_thumbnails *bool
 	created_at               *time.Time
 	updated_at               *time.Time
@@ -4015,6 +4017,76 @@ func (m *VideoMutation) ResetThumbnailsInterval() {
 	delete(m.clearedFields, video.FieldThumbnailsInterval)
 }
 
+// SetThumbnailsRows sets the "thumbnails_rows" field.
+func (m *VideoMutation) SetThumbnailsRows(i int) {
+	m.thumbnails_rows = &i
+	m.addthumbnails_rows = nil
+}
+
+// ThumbnailsRows returns the value of the "thumbnails_rows" field in the mutation.
+func (m *VideoMutation) ThumbnailsRows() (r int, exists bool) {
+	v := m.thumbnails_rows
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldThumbnailsRows returns the old "thumbnails_rows" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldThumbnailsRows(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldThumbnailsRows is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldThumbnailsRows requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldThumbnailsRows: %w", err)
+	}
+	return oldValue.ThumbnailsRows, nil
+}
+
+// AddThumbnailsRows adds i to the "thumbnails_rows" field.
+func (m *VideoMutation) AddThumbnailsRows(i int) {
+	if m.addthumbnails_rows != nil {
+		*m.addthumbnails_rows += i
+	} else {
+		m.addthumbnails_rows = &i
+	}
+}
+
+// AddedThumbnailsRows returns the value that was added to the "thumbnails_rows" field in this mutation.
+func (m *VideoMutation) AddedThumbnailsRows() (r int, exists bool) {
+	v := m.addthumbnails_rows
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearThumbnailsRows clears the value of the "thumbnails_rows" field.
+func (m *VideoMutation) ClearThumbnailsRows() {
+	m.thumbnails_rows = nil
+	m.addthumbnails_rows = nil
+	m.clearedFields[video.FieldThumbnailsRows] = struct{}{}
+}
+
+// ThumbnailsRowsCleared returns if the "thumbnails_rows" field was cleared in this mutation.
+func (m *VideoMutation) ThumbnailsRowsCleared() bool {
+	_, ok := m.clearedFields[video.FieldThumbnailsRows]
+	return ok
+}
+
+// ResetThumbnailsRows resets all changes to the "thumbnails_rows" field.
+func (m *VideoMutation) ResetThumbnailsRows() {
+	m.thumbnails_rows = nil
+	m.addthumbnails_rows = nil
+	delete(m.clearedFields, video.FieldThumbnailsRows)
+}
+
 // SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
 func (m *VideoMutation) SetEosGeneratedThumbnails(b bool) {
 	m.eos_generated_thumbnails = &b
@@ -4317,7 +4389,7 @@ func (m *VideoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VideoMutation) Fields() []string {
-	fields := make([]string, 0, 33)
+	fields := make([]string, 0, 34)
 	if m.title != nil {
 		fields = append(fields, video.FieldTitle)
 	}
@@ -4408,6 +4480,9 @@ func (m *VideoMutation) Fields() []string {
 	if m.thumbnails_interval != nil {
 		fields = append(fields, video.FieldThumbnailsInterval)
 	}
+	if m.thumbnails_rows != nil {
+		fields = append(fields, video.FieldThumbnailsRows)
+	}
 	if m.eos_generated_thumbnails != nil {
 		fields = append(fields, video.FieldEosGeneratedThumbnails)
 	}
@@ -4485,6 +4560,8 @@ func (m *VideoMutation) Field(name string) (ent.Value, bool) {
 		return m.ThumbnailsHeight()
 	case video.FieldThumbnailsInterval:
 		return m.ThumbnailsInterval()
+	case video.FieldThumbnailsRows:
+		return m.ThumbnailsRows()
 	case video.FieldEosGeneratedThumbnails:
 		return m.EosGeneratedThumbnails()
 	case video.FieldCreatedAt:
@@ -4560,6 +4637,8 @@ func (m *VideoMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldThumbnailsHeight(ctx)
 	case video.FieldThumbnailsInterval:
 		return m.OldThumbnailsInterval(ctx)
+	case video.FieldThumbnailsRows:
+		return m.OldThumbnailsRows(ctx)
 	case video.FieldEosGeneratedThumbnails:
 		return m.OldEosGeneratedThumbnails(ctx)
 	case video.FieldCreatedAt:
@@ -4785,6 +4864,13 @@ func (m *VideoMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetThumbnailsInterval(v)
 		return nil
+	case video.FieldThumbnailsRows:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetThumbnailsRows(v)
+		return nil
 	case video.FieldEosGeneratedThumbnails:
 		v, ok := value.(bool)
 		if !ok {
@@ -4856,6 +4942,9 @@ func (m *VideoMutation) AddedFields() []string {
 	if m.addthumbnails_interval != nil {
 		fields = append(fields, video.FieldThumbnailsInterval)
 	}
+	if m.addthumbnails_rows != nil {
+		fields = append(fields, video.FieldThumbnailsRows)
+	}
 	return fields
 }
 
@@ -4892,6 +4981,8 @@ func (m *VideoMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedThumbnailsHeight()
 	case video.FieldThumbnailsInterval:
 		return m.AddedThumbnailsInterval()
+	case video.FieldThumbnailsRows:
+		return m.AddedThumbnailsRows()
 	}
 	return nil, false
 }
@@ -4999,6 +5090,13 @@ func (m *VideoMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddThumbnailsInterval(v)
 		return nil
+	case video.FieldThumbnailsRows:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddThumbnailsRows(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Video numeric field %s", name)
 }
@@ -5066,6 +5164,9 @@ func (m *VideoMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(video.FieldThumbnailsInterval) {
 		fields = append(fields, video.FieldThumbnailsInterval)
+	}
+	if m.FieldCleared(video.FieldThumbnailsRows) {
+		fields = append(fields, video.FieldThumbnailsRows)
 	}
 	if m.FieldCleared(video.FieldEosGeneratedThumbnails) {
 		fields = append(fields, video.FieldEosGeneratedThumbnails)
@@ -5143,6 +5244,9 @@ func (m *VideoMutation) ClearField(name string) error {
 		return nil
 	case video.FieldThumbnailsInterval:
 		m.ClearThumbnailsInterval()
+		return nil
+	case video.FieldThumbnailsRows:
+		m.ClearThumbnailsRows()
 		return nil
 	case video.FieldEosGeneratedThumbnails:
 		m.ClearEosGeneratedThumbnails()
@@ -5244,6 +5348,9 @@ func (m *VideoMutation) ResetField(name string) error {
 		return nil
 	case video.FieldThumbnailsInterval:
 		m.ResetThumbnailsInterval()
+		return nil
+	case video.FieldThumbnailsRows:
+		m.ResetThumbnailsRows()
 		return nil
 	case video.FieldEosGeneratedThumbnails:
 		m.ResetEosGeneratedThumbnails()

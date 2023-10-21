@@ -589,6 +589,33 @@ func (vu *VideoUpdate) ClearThumbnailsInterval() *VideoUpdate {
 	return vu
 }
 
+// SetThumbnailsRows sets the "thumbnails_rows" field.
+func (vu *VideoUpdate) SetThumbnailsRows(i int) *VideoUpdate {
+	vu.mutation.ResetThumbnailsRows()
+	vu.mutation.SetThumbnailsRows(i)
+	return vu
+}
+
+// SetNillableThumbnailsRows sets the "thumbnails_rows" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableThumbnailsRows(i *int) *VideoUpdate {
+	if i != nil {
+		vu.SetThumbnailsRows(*i)
+	}
+	return vu
+}
+
+// AddThumbnailsRows adds i to the "thumbnails_rows" field.
+func (vu *VideoUpdate) AddThumbnailsRows(i int) *VideoUpdate {
+	vu.mutation.AddThumbnailsRows(i)
+	return vu
+}
+
+// ClearThumbnailsRows clears the value of the "thumbnails_rows" field.
+func (vu *VideoUpdate) ClearThumbnailsRows() *VideoUpdate {
+	vu.mutation.ClearThumbnailsRows()
+	return vu
+}
+
 // SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
 func (vu *VideoUpdate) SetEosGeneratedThumbnails(b bool) *VideoUpdate {
 	vu.mutation.SetEosGeneratedThumbnails(b)
@@ -965,6 +992,15 @@ func (vu *VideoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if vu.mutation.ThumbnailsIntervalCleared() {
 		_spec.ClearField(video.FieldThumbnailsInterval, field.TypeFloat64)
+	}
+	if value, ok := vu.mutation.ThumbnailsRows(); ok {
+		_spec.SetField(video.FieldThumbnailsRows, field.TypeInt, value)
+	}
+	if value, ok := vu.mutation.AddedThumbnailsRows(); ok {
+		_spec.AddField(video.FieldThumbnailsRows, field.TypeInt, value)
+	}
+	if vu.mutation.ThumbnailsRowsCleared() {
+		_spec.ClearField(video.FieldThumbnailsRows, field.TypeInt)
 	}
 	if value, ok := vu.mutation.EosGeneratedThumbnails(); ok {
 		_spec.SetField(video.FieldEosGeneratedThumbnails, field.TypeBool, value)
@@ -1696,6 +1732,33 @@ func (vuo *VideoUpdateOne) ClearThumbnailsInterval() *VideoUpdateOne {
 	return vuo
 }
 
+// SetThumbnailsRows sets the "thumbnails_rows" field.
+func (vuo *VideoUpdateOne) SetThumbnailsRows(i int) *VideoUpdateOne {
+	vuo.mutation.ResetThumbnailsRows()
+	vuo.mutation.SetThumbnailsRows(i)
+	return vuo
+}
+
+// SetNillableThumbnailsRows sets the "thumbnails_rows" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableThumbnailsRows(i *int) *VideoUpdateOne {
+	if i != nil {
+		vuo.SetThumbnailsRows(*i)
+	}
+	return vuo
+}
+
+// AddThumbnailsRows adds i to the "thumbnails_rows" field.
+func (vuo *VideoUpdateOne) AddThumbnailsRows(i int) *VideoUpdateOne {
+	vuo.mutation.AddThumbnailsRows(i)
+	return vuo
+}
+
+// ClearThumbnailsRows clears the value of the "thumbnails_rows" field.
+func (vuo *VideoUpdateOne) ClearThumbnailsRows() *VideoUpdateOne {
+	vuo.mutation.ClearThumbnailsRows()
+	return vuo
+}
+
 // SetEosGeneratedThumbnails sets the "eos_generated_thumbnails" field.
 func (vuo *VideoUpdateOne) SetEosGeneratedThumbnails(b bool) *VideoUpdateOne {
 	vuo.mutation.SetEosGeneratedThumbnails(b)
@@ -2096,6 +2159,15 @@ func (vuo *VideoUpdateOne) sqlSave(ctx context.Context) (_node *Video, err error
 	}
 	if vuo.mutation.ThumbnailsIntervalCleared() {
 		_spec.ClearField(video.FieldThumbnailsInterval, field.TypeFloat64)
+	}
+	if value, ok := vuo.mutation.ThumbnailsRows(); ok {
+		_spec.SetField(video.FieldThumbnailsRows, field.TypeInt, value)
+	}
+	if value, ok := vuo.mutation.AddedThumbnailsRows(); ok {
+		_spec.AddField(video.FieldThumbnailsRows, field.TypeInt, value)
+	}
+	if vuo.mutation.ThumbnailsRowsCleared() {
+		_spec.ClearField(video.FieldThumbnailsRows, field.TypeInt)
 	}
 	if value, ok := vuo.mutation.EosGeneratedThumbnails(); ok {
 		_spec.SetField(video.FieldEosGeneratedThumbnails, field.TypeBool, value)

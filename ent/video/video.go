@@ -71,6 +71,8 @@ const (
 	FieldThumbnailsHeight = "thumbnails_height"
 	// FieldThumbnailsInterval holds the string denoting the thumbnails_interval field in the database.
 	FieldThumbnailsInterval = "thumbnails_interval"
+	// FieldThumbnailsRows holds the string denoting the thumbnails_rows field in the database.
+	FieldThumbnailsRows = "thumbnails_rows"
 	// FieldEosGeneratedThumbnails holds the string denoting the eos_generated_thumbnails field in the database.
 	FieldEosGeneratedThumbnails = "eos_generated_thumbnails"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -141,6 +143,7 @@ var Columns = []string{
 	FieldThumbnailsWidth,
 	FieldThumbnailsHeight,
 	FieldThumbnailsInterval,
+	FieldThumbnailsRows,
 	FieldEosGeneratedThumbnails,
 	FieldCreatedAt,
 	FieldUpdatedAt,

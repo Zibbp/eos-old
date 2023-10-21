@@ -20,6 +20,10 @@ type StartVideoGenerateThumbnailsTaskRequest struct {
 	VideoID string `json:"video_id" validate:"required"`
 }
 
+type StartVideoDownloadThumbnailsRequest struct {
+	VideoID string `json:"video_id" validate:"required"`
+}
+
 func (h *Handler) StartVideoScannerTask(c echo.Context) error {
 
 	var request StartVideoScannerTaskRequest
@@ -52,6 +56,24 @@ func (h *Handler) StartVideoGenerateThumbnailsTask(c echo.Context) error {
 	}
 
 	task, err := tasks.NewVideoGenerateThumbnailsTask(request.VideoID)
+	if err != nil {
+		return c.JSON(500, errors.New(500, err.Error()))
+	}
+
+	info, err := redis.GetAsynqClient().Client.Enqueue(task, asynq.Queue(string(utils.ThumbnailGeneratorQueue)), asynq.Unique(time.Hour))
+	if err != nil {
+		return c.JSON(500, errors.New(500, err.Error()))
+	}
+	log.Info().Msgf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
+	response := map[string]interface{}{
+		"task_id": info.ID,
+	}
+
+	return c.JSON(200, response)
+}
+
+func (h *Handler) StartVideoDownloadThumbnailsTask(c echo.Context) error {
+	task, err := tasks.NewVideoStartProcessTask(utils.DownloadThumbnails)
 	if err != nil {
 		return c.JSON(500, errors.New(500, err.Error()))
 	}

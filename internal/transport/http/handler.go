@@ -113,6 +113,7 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	tasksGroup := e.Group("/tasks")
 	tasksGroup.POST("/video/start_scanner", h.StartVideoScannerTask)
 	tasksGroup.POST("/video/generate_thumbnails", h.StartVideoGenerateThumbnailsTask)
+	tasksGroup.POST("/video/download_thumbnails", h.StartVideoDownloadThumbnailsTask)
 }
 
 func (h *Handler) Serve() error {
