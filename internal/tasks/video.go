@@ -120,70 +120,70 @@ func HandleVideoGenerateThumbnailsTask(ctx context.Context, t *asynq.Task) error
 		return err
 	}
 
-	// // ffprobe
-	// ffprobeArgs := []string{
-	// 	"-v",
-	// 	"error",
-	// 	"-select_streams",
-	// 	"v:0",
-	// 	"-show_entries",
-	// 	"stream=codec_name",
-	// 	"-of",
-	// 	"default=noprint_wrappers=1:nokey=1",
-	// }
+	// ffprobe
+	ffprobeArgs := []string{
+		"-v",
+		"error",
+		"-select_streams",
+		"v:0",
+		"-show_entries",
+		"stream=codec_name",
+		"-of",
+		"default=noprint_wrappers=1:nokey=1",
+	}
 
-	// // get video codec
-	// videoCodec, err := utils.ExecuteFFprobeCommand(ffprobeArgs, dbVideo.VideoPath)
-	// if err != nil {
-	// 	log.Error().Err(err).Str("task", TypeVideoGenerateThumbnails).Msgf("failed to get video codec for video: %s", p.VideoID)
-	// 	_ = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", p.VideoID))
-	// 	return err
-	// }
-	// // trim any whitespace
-	// videoCodec = []byte(string(videoCodec)[:len(videoCodec)-1])
-	// fmt.Println(string(videoCodec))
+	// get video codec
+	videoCodec, err := utils.ExecuteFFprobeCommand(ffprobeArgs, dbVideo.VideoPath)
+	if err != nil {
+		log.Error().Err(err).Str("task", TypeVideoGenerateThumbnails).Msgf("failed to get video codec for video: %s", p.VideoID)
+		_ = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", p.VideoID))
+		return err
+	}
+	// trim any whitespace
+	videoCodec = []byte(string(videoCodec)[:len(videoCodec)-1])
+	fmt.Println(string(videoCodec))
 
-	// hardwareDecodeAvailable := false
-	// inputCodec := ""
+	hardwareDecodeAvailable := false
+	inputCodec := ""
 
-	// switch string(videoCodec) {
-	// case "h264":
-	// 	hardwareDecodeAvailable = true
-	// 	inputCodec = "h264_qsv"
-	// case "vp9":
-	// 	hardwareDecodeAvailable = true
-	// 	inputCodec = "vp9_qsv"
-	// case "av1":
-	// 	hardwareDecodeAvailable = true
-	// 	inputCodec = "av1_qsv"
-	// }
+	switch string(videoCodec) {
+	case "h264":
+		hardwareDecodeAvailable = true
+		inputCodec = "h264_qsv"
+	case "vp9":
+		hardwareDecodeAvailable = true
+		inputCodec = "vp9_qsv"
+	case "av1":
+		hardwareDecodeAvailable = true
+		inputCodec = "av1_qsv"
+	}
 
-	// preFfmpegArgs := []string{
-	// 	"-hwaccel",
-	// 	"qsv",
-	// }
+	preFfmpegArgs := []string{
+		"-hwaccel",
+		"qsv",
+	}
 
-	// if hardwareDecodeAvailable {
-	// 	preFfmpegArgs = append(preFfmpegArgs, "-c:v", inputCodec)
-	// }
+	if hardwareDecodeAvailable {
+		preFfmpegArgs = append(preFfmpegArgs, "-c:v", inputCodec)
+	}
 
-	// // -vf "hwdownload,format=nv12,fps=1/10,scale=160:90"
+	// -vf "hwdownload,format=nv12,fps=1/10,scale=160:90"
 
-	// ffmpegArgs := []string{
-	// 	"-vf",
-	// 	"hwdownload,format=nv12,fps=1/10,scale=160:90",
-	// 	fmt.Sprintf("/tmp/%s/thumbnail%%05d.jpg", p.VideoID),
-	// }
-
-	// CPU
-	preFfmpegArgs := []string{}
 	ffmpegArgs := []string{
 		"-vf",
-		"fps=1/10,scale=160:90:flags=lanczos",
-		"-q:v",
-		"3",
+		"hwdownload,format=nv12,fps=1/10,scale=160:90",
 		fmt.Sprintf("/tmp/%s/thumbnail%%05d.jpg", p.VideoID),
 	}
+
+	// // CPU
+	// preFfmpegArgs := []string{}
+	// ffmpegArgs := []string{
+	// 	"-vf",
+	// 	"fps=1/10,scale=160:90:flags=lanczos",
+	// 	"-q:v",
+	// 	"3",
+	// 	fmt.Sprintf("/tmp/%s/thumbnail%%05d.jpg", p.VideoID),
+	// }
 
 	// execute ffmpeg to generate thumbnails
 	err = utils.ExecuteFFmpegCommand(dbVideo.VideoPath, preFfmpegArgs, ffmpegArgs)
@@ -220,6 +220,13 @@ func HandleVideoGenerateThumbnailsTask(ctx context.Context, t *asynq.Task) error
 	err = utils.RemoveDirectory(fmt.Sprintf("/tmp/%s", p.VideoID))
 	if err != nil {
 		log.Error().Err(err).Str("task", TypeVideoGenerateThumbnails).Msgf("failed to remove tmp directory: %s", p.VideoID)
+		return err
+	}
+
+	// update video
+	_, err = dbVideo.Update().SetThumbnailsPath(fmt.Sprintf("%s/%s", dbVideo.Path, "thumbnails.jpg")).SetThumbnailsWidth(160).SetThumbnailsHeight(90).SetThumbnailsInterval(10).SetThumbnailsRows(5).SetEosGeneratedThumbnails(true).Save(ctx)
+	if err != nil {
+		log.Error().Err(err).Str("task", TypeVideoGenerateThumbnails).Msgf("failed to update video %s", p.VideoID)
 		return err
 	}
 
