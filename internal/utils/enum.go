@@ -18,6 +18,7 @@ type VideoProcessTask string
 
 const (
 	DownloadThumbnails VideoProcessTask = "download_thumbnails"
+	GenerateThumbnails VideoProcessTask = "generate_thumbnails"
 )
 
 func (VideoProcessTask) Values() (kinds []string) {

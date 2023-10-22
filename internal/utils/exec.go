@@ -16,7 +16,7 @@ func ExecuteFFmpegCommand(inputFile string, preArgs []string, args []string) err
 	newArgs = append(newArgs, "-i", inputFile)
 	newArgs = append(newArgs, args...)
 
-	fmt.Println(newArgs)
+	log.Debug().Msgf("Running ffmpeg with args: %v", newArgs)
 
 	cmd := exec.Command("ffmpeg", newArgs...)
 

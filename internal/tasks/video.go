@@ -48,7 +48,7 @@ func NewVideoGenerateThumbnailsTask(videoID string) (*asynq.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	return asynq.NewTask(TypeVideoGenerateThumbnails, payload, asynq.MaxRetry(2), asynq.Queue(string(utils.ThumbnailGeneratorQueue)), asynq.Timeout(0)), nil
+	return asynq.NewTask(TypeVideoGenerateThumbnails, payload, asynq.MaxRetry(0), asynq.Queue(string(utils.ThumbnailGeneratorQueue)), asynq.Timeout(0)), nil
 }
 
 func NewVideoDownloadThumbnailsTask(videoID string) (*asynq.Task, error) {
@@ -92,6 +92,27 @@ func HandleVideoStartProcessTask(ctx context.Context, t *asynq.Task) error {
 			}
 
 			log.Debug().Str("task", TypeVideoStartProcess).Msgf("enqueued task: %s, video: %s", TypeVideoDownloadThumbnails, videoTask.ID)
+		case utils.GenerateThumbnails:
+			if !video.Edges.Channel.GenerateThumbnails {
+				continue
+			}
+			if video.ThumbnailsPath != "" {
+				continue
+			}
+			// generate thumbnails
+			task, err := NewVideoGenerateThumbnailsTask(video.ID)
+			if err != nil {
+				log.Error().Err(err).Str("task", TypeVideoStartProcess).Msgf("failed to create task: %s", TypeVideoGenerateThumbnails)
+				return err
+			}
+
+			videoTask, err := redis.GetAsynqClient().Client.Enqueue(task)
+			if err != nil {
+				log.Error().Err(err).Str("task", TypeVideoStartProcess).Msgf("failed to enqueue task: %s", TypeVideoGenerateThumbnails)
+				return err
+			}
+
+			log.Debug().Str("task", TypeVideoStartProcess).Msgf("enqueued task: %s, video: %s", TypeVideoGenerateThumbnails, videoTask.ID)
 		}
 	}
 
@@ -141,7 +162,7 @@ func HandleVideoGenerateThumbnailsTask(ctx context.Context, t *asynq.Task) error
 	}
 	// trim any whitespace
 	videoCodec = []byte(string(videoCodec)[:len(videoCodec)-1])
-	fmt.Println(string(videoCodec))
+	log.Debug().Str("task", TypeVideoGenerateThumbnails).Msgf("video codec: %s", string(videoCodec))
 
 	hardwareDecodeAvailable := false
 	inputCodec := ""

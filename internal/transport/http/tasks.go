@@ -48,14 +48,29 @@ func (h *Handler) StartVideoScannerTask(c echo.Context) error {
 	return c.JSON(200, response)
 }
 
-func (h *Handler) StartVideoGenerateThumbnailsTask(c echo.Context) error {
-
-	var request StartVideoGenerateThumbnailsTaskRequest
-	if err := c.Bind(&request); err != nil {
-		return echo.NewHTTPError(400, errors.New(400, err.Error()))
+func (h *Handler) StartVideoGenerateAllThumbnailsTask(c echo.Context) error {
+	task, err := tasks.NewVideoStartProcessTask(utils.GenerateThumbnails)
+	if err != nil {
+		return c.JSON(500, errors.New(500, err.Error()))
 	}
 
-	task, err := tasks.NewVideoGenerateThumbnailsTask(request.VideoID)
+	info, err := redis.GetAsynqClient().Client.Enqueue(task, asynq.Queue(string(utils.ThumbnailGeneratorQueue)), asynq.Unique(time.Hour))
+	if err != nil {
+		return c.JSON(500, errors.New(500, err.Error()))
+	}
+	log.Info().Msgf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
+	response := map[string]interface{}{
+		"task_id": info.ID,
+	}
+
+	return c.JSON(200, response)
+}
+
+func (h *Handler) StartVideoGenerateThumbnailsTask(c echo.Context) error {
+
+	videoID := c.Param("id")
+
+	task, err := tasks.NewVideoGenerateThumbnailsTask(videoID)
 	if err != nil {
 		return c.JSON(500, errors.New(500, err.Error()))
 	}
