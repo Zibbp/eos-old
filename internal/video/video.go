@@ -214,7 +214,7 @@ func (s *Service) GenerateThumbnailsVTT(c echo.Context, cdnURL, videoID string) 
 }
 
 func ScannerGetVideos() ([]*ent.Video, error) {
-	videos, err := database.DB().Client.Video.Query().All(context.Background())
+	videos, err := database.DB().Client.Video.Query().WithChannel().All(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get videos: %v", err)
 	}
