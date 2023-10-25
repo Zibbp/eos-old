@@ -6,10 +6,9 @@ import (
 	"github.com/zibbp/eos/ent"
 	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/internal/database"
-	"github.com/zibbp/eos/internal/utils"
 )
 
-func UpdateProgress(videoId string, timestamp int, ctx context.Context) error {
+func UpdateProgress(videoId string, timestamp int, status string, ctx context.Context) error {
 	pb, err := database.DB().Client.Playback.Query().Where(playback.VideoID(videoId)).Only(ctx)
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
@@ -22,8 +21,16 @@ func UpdateProgress(videoId string, timestamp int, ctx context.Context) error {
 		return err
 	}
 
+	newStatus := playback.StatusInProgress
+	if status == "finished" {
+		newStatus = playback.StatusFinished
+	}
+
 	if pb != nil {
-		pb.Update().SetTimestamp(timestamp).Save(ctx)
+		_, err := pb.Update().SetTimestamp(timestamp).SetStatus(newStatus).Save(ctx)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -47,8 +54,12 @@ func GetAllProgress(ctx context.Context) ([]*ent.Playback, error) {
 	return pb, nil
 }
 
-func UpdateStatus(videoId string, status utils.PlaybackStatus, ctx context.Context) error {
-	_, err := database.DB().Client.Playback.Update().Where(playback.VideoID(videoId)).SetStatus(status).Save(ctx)
+func UpdateStatus(videoId string, status string, ctx context.Context) error {
+	newStatus := playback.StatusInProgress
+	if status == "finished" {
+		newStatus = playback.StatusFinished
+	}
+	_, err := database.DB().Client.Playback.Update().Where(playback.VideoID(videoId)).SetStatus(newStatus).Save(ctx)
 	if err != nil {
 		return err
 	}

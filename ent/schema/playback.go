@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 // Playback holds the schema definition for the Playback entity.
@@ -20,7 +19,7 @@ func (Playback) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("video_id").NotEmpty(),
 		field.Int("timestamp").Default(0),
-		field.Enum("status").GoType(utils.PlaybackStatus("")).Default(string(utils.PlaybackInProgress)).Optional(),
+		field.Enum("status").Values("in_progress", "finished").Optional().Default("in_progress"),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

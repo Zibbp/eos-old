@@ -79,7 +79,7 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "video_id", Type: field.TypeString},
 		{Name: "timestamp", Type: field.TypeInt, Default: 0},
-		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"in_progress", "playback_finished"}, Default: "in_progress"},
+		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"in_progress", "finished"}, Default: "in_progress"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

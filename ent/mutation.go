@@ -16,7 +16,6 @@ import (
 	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/ent/predicate"
 	"github.com/zibbp/eos/ent/video"
-	"github.com/zibbp/eos/internal/utils"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -2226,7 +2225,7 @@ type PlaybackMutation struct {
 	video_id      *string
 	timestamp     *int
 	addtimestamp  *int
-	status        *utils.PlaybackStatus
+	status        *playback.Status
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -2432,12 +2431,12 @@ func (m *PlaybackMutation) ResetTimestamp() {
 }
 
 // SetStatus sets the "status" field.
-func (m *PlaybackMutation) SetStatus(us utils.PlaybackStatus) {
-	m.status = &us
+func (m *PlaybackMutation) SetStatus(pl playback.Status) {
+	m.status = &pl
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *PlaybackMutation) Status() (r utils.PlaybackStatus, exists bool) {
+func (m *PlaybackMutation) Status() (r playback.Status, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -2448,7 +2447,7 @@ func (m *PlaybackMutation) Status() (r utils.PlaybackStatus, exists bool) {
 // OldStatus returns the old "status" field's value of the Playback entity.
 // If the Playback object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PlaybackMutation) OldStatus(ctx context.Context) (v utils.PlaybackStatus, err error) {
+func (m *PlaybackMutation) OldStatus(ctx context.Context) (v playback.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -2663,7 +2662,7 @@ func (m *PlaybackMutation) SetField(name string, value ent.Value) error {
 		m.SetTimestamp(v)
 		return nil
 	case playback.FieldStatus:
-		v, ok := value.(utils.PlaybackStatus)
+		v, ok := value.(playback.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

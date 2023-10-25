@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/zibbp/eos/ent/playback"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 // PlaybackCreate is the builder for creating a Playback entity.
@@ -43,15 +42,15 @@ func (pc *PlaybackCreate) SetNillableTimestamp(i *int) *PlaybackCreate {
 }
 
 // SetStatus sets the "status" field.
-func (pc *PlaybackCreate) SetStatus(us utils.PlaybackStatus) *PlaybackCreate {
-	pc.mutation.SetStatus(us)
+func (pc *PlaybackCreate) SetStatus(pl playback.Status) *PlaybackCreate {
+	pc.mutation.SetStatus(pl)
 	return pc
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (pc *PlaybackCreate) SetNillableStatus(us *utils.PlaybackStatus) *PlaybackCreate {
-	if us != nil {
-		pc.SetStatus(*us)
+func (pc *PlaybackCreate) SetNillableStatus(pl *playback.Status) *PlaybackCreate {
+	if pl != nil {
+		pc.SetStatus(*pl)
 	}
 	return pc
 }

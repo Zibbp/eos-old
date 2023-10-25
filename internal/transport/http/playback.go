@@ -1,16 +1,17 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/labstack/echo/v4"
 	"github.com/zibbp/eos/internal/errors"
 	"github.com/zibbp/eos/internal/playback"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 type PlaybackRequest struct {
 	// VideoID   string               `json:"video_id" validate:"required"`
-	Timestamp int                  `json:"timestamp" validate:"required"`
-	Status    utils.PlaybackStatus `json:"status" validate:"required"`
+	Timestamp int    `json:"timestamp" validate:"required"`
+	Status    string `json:"status" validate:"required" enum:"in_progress,finished"`
 }
 
 func UpdateProgress(c echo.Context) error {
@@ -30,7 +31,9 @@ func UpdateProgress(c echo.Context) error {
 		return echo.NewHTTPError(400, errors.New(400, err.Error()))
 	}
 
-	err := playback.UpdateProgress(videoID, req.Timestamp, c.Request().Context())
+	fmt.Println(req.Status)
+
+	err := playback.UpdateProgress(videoID, req.Timestamp, req.Status, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(500, errors.New(500, err.Error()))
 	}

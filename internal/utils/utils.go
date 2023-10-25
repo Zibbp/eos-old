@@ -138,6 +138,13 @@ func DownloadFile(url string, filePath string) error {
 }
 
 func GenerateVTT(baseURL string, width, height, duration int, interval float64, rows int) string {
+	if rows == 0 {
+		return "WEBVTT\n\n" // or handle this case differently
+	}
+	if interval == 0 {
+		return "WEBVTT\n\n" // or handle this case differently
+	}
+
 	vttContent := "WEBVTT\n\n"
 	tilesAcross := rows
 	numThumbnails := int(float64(duration) / interval)

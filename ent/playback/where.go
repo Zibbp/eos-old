@@ -8,7 +8,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/zibbp/eos/ent/predicate"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 // ID filters vertices based on their ID field.
@@ -182,33 +181,23 @@ func TimestampLTE(v int) predicate.Playback {
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v utils.PlaybackStatus) predicate.Playback {
-	vc := v
-	return predicate.Playback(sql.FieldEQ(FieldStatus, vc))
+func StatusEQ(v Status) predicate.Playback {
+	return predicate.Playback(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v utils.PlaybackStatus) predicate.Playback {
-	vc := v
-	return predicate.Playback(sql.FieldNEQ(FieldStatus, vc))
+func StatusNEQ(v Status) predicate.Playback {
+	return predicate.Playback(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...utils.PlaybackStatus) predicate.Playback {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Playback(sql.FieldIn(FieldStatus, v...))
+func StatusIn(vs ...Status) predicate.Playback {
+	return predicate.Playback(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...utils.PlaybackStatus) predicate.Playback {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Playback(sql.FieldNotIn(FieldStatus, v...))
+func StatusNotIn(vs ...Status) predicate.Playback {
+	return predicate.Playback(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // StatusIsNil applies the IsNil predicate on the "status" field.

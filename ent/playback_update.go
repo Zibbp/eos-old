@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/ent/predicate"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 // PlaybackUpdate is the builder for updating Playback entities.
@@ -57,15 +56,15 @@ func (pu *PlaybackUpdate) AddTimestamp(i int) *PlaybackUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (pu *PlaybackUpdate) SetStatus(us utils.PlaybackStatus) *PlaybackUpdate {
-	pu.mutation.SetStatus(us)
+func (pu *PlaybackUpdate) SetStatus(pl playback.Status) *PlaybackUpdate {
+	pu.mutation.SetStatus(pl)
 	return pu
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (pu *PlaybackUpdate) SetNillableStatus(us *utils.PlaybackStatus) *PlaybackUpdate {
-	if us != nil {
-		pu.SetStatus(*us)
+func (pu *PlaybackUpdate) SetNillableStatus(pl *playback.Status) *PlaybackUpdate {
+	if pl != nil {
+		pu.SetStatus(*pl)
 	}
 	return pu
 }
@@ -225,15 +224,15 @@ func (puo *PlaybackUpdateOne) AddTimestamp(i int) *PlaybackUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (puo *PlaybackUpdateOne) SetStatus(us utils.PlaybackStatus) *PlaybackUpdateOne {
-	puo.mutation.SetStatus(us)
+func (puo *PlaybackUpdateOne) SetStatus(pl playback.Status) *PlaybackUpdateOne {
+	puo.mutation.SetStatus(pl)
 	return puo
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (puo *PlaybackUpdateOne) SetNillableStatus(us *utils.PlaybackStatus) *PlaybackUpdateOne {
-	if us != nil {
-		puo.SetStatus(*us)
+func (puo *PlaybackUpdateOne) SetNillableStatus(pl *playback.Status) *PlaybackUpdateOne {
+	if pl != nil {
+		puo.SetStatus(*pl)
 	}
 	return puo
 }

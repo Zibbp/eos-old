@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/zibbp/eos/ent/playback"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 // Playback is the model entity for the Playback schema.
@@ -23,7 +22,7 @@ type Playback struct {
 	// Timestamp holds the value of the "timestamp" field.
 	Timestamp int `json:"timestamp,omitempty"`
 	// Status holds the value of the "status" field.
-	Status utils.PlaybackStatus `json:"status,omitempty"`
+	Status playback.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -80,7 +79,7 @@ func (pl *Playback) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				pl.Status = utils.PlaybackStatus(value.String)
+				pl.Status = playback.Status(value.String)
 			}
 		case playback.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

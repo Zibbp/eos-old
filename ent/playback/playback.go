@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/zibbp/eos/internal/utils"
 )
 
 const (
@@ -64,12 +63,26 @@ var (
 	DefaultID func() uuid.UUID
 )
 
-const DefaultStatus utils.PlaybackStatus = "in_progress"
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusInProgress is the default value of the Status enum.
+const DefaultStatus = StatusInProgress
+
+// Status values.
+const (
+	StatusInProgress Status = "in_progress"
+	StatusFinished   Status = "finished"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
 
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s utils.PlaybackStatus) error {
+func StatusValidator(s Status) error {
 	switch s {
-	case "in_progress", "playback_finished":
+	case StatusInProgress, StatusFinished:
 		return nil
 	default:
 		return fmt.Errorf("playback: invalid enum value for status field: %q", s)
