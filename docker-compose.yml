@@ -10,13 +10,46 @@ services:
       - DB_USER=eos
       - DB_PASS=SECRET
       - DB_NAME=eos
+      - REDIS_HOST=eos-redis
+      - REDIS_PORT=6379
+      - REDIS_PASS=secret123
+      - REDIS_DB=0
     volumes:
       - /path/to/YouTube/videos:/videos:ro
-      - ./data:/data
     depends_on:
       - eos-db
     ports:
       - 4600:4000
+  eos-worker:
+    container_name: eos-worker
+    image: ghcr.io/zibbp/eos:latest
+    restart: unless-stopped
+    environment:
+      - DB_HOST=eos-db
+      - DB_PORT=5432
+      - DB_USER=eos
+      - DB_PASS=SECRET
+      - DB_NAME=eos
+      - REDIS_HOST=eos-redis
+      - REDIS_PORT=6379
+      - REDIS_PASS=secret123
+      - REDIS_DB=0
+      - WORKER_CONCURRENCY=10
+      - WORKER_QUEUE_SCANNER=10
+      - WORKER_QUEUE_THUMBNAIL=1
+    volumes:
+      - /path/to/YouTube/videos:/videos:ro
+    command: ["./eos-worker"]
+  eos-redis:
+    container_name: eos-redis
+    image: bitnami/redis:latest
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=secret123
+    ports:
+      - 4604:6379
+    volumes:
+      - ./redis-data:/bitnami/redis/data
   eos-frontend:
     container_name: eos-frontend
     image: ghcr.io/zibbp/eos-frontend:latest

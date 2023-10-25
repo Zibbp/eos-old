@@ -5,7 +5,9 @@ package ent
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/zibbp/eos/ent/channel"
+	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/ent/schema"
 	"github.com/zibbp/eos/ent/video"
 )
@@ -30,6 +32,30 @@ func init() {
 	channel.DefaultUpdatedAt = channelDescUpdatedAt.Default.(func() time.Time)
 	// channel.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	channel.UpdateDefaultUpdatedAt = channelDescUpdatedAt.UpdateDefault.(func() time.Time)
+	playbackFields := schema.Playback{}.Fields()
+	_ = playbackFields
+	// playbackDescVideoID is the schema descriptor for video_id field.
+	playbackDescVideoID := playbackFields[1].Descriptor()
+	// playback.VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
+	playback.VideoIDValidator = playbackDescVideoID.Validators[0].(func(string) error)
+	// playbackDescTimestamp is the schema descriptor for timestamp field.
+	playbackDescTimestamp := playbackFields[2].Descriptor()
+	// playback.DefaultTimestamp holds the default value on creation for the timestamp field.
+	playback.DefaultTimestamp = playbackDescTimestamp.Default.(int)
+	// playbackDescCreatedAt is the schema descriptor for created_at field.
+	playbackDescCreatedAt := playbackFields[4].Descriptor()
+	// playback.DefaultCreatedAt holds the default value on creation for the created_at field.
+	playback.DefaultCreatedAt = playbackDescCreatedAt.Default.(func() time.Time)
+	// playbackDescUpdatedAt is the schema descriptor for updated_at field.
+	playbackDescUpdatedAt := playbackFields[5].Descriptor()
+	// playback.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	playback.DefaultUpdatedAt = playbackDescUpdatedAt.Default.(func() time.Time)
+	// playback.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	playback.UpdateDefaultUpdatedAt = playbackDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// playbackDescID is the schema descriptor for id field.
+	playbackDescID := playbackFields[0].Descriptor()
+	// playback.DefaultID holds the default value on creation for the id field.
+	playback.DefaultID = playbackDescID.Default.(func() uuid.UUID)
 	videoFields := schema.Video{}.Fields()
 	_ = videoFields
 	// videoDescCreatedAt is the schema descriptor for created_at field.

@@ -15,5 +15,8 @@ type Chapter func(*sql.Selector)
 // Comment is the predicate function for comment builders.
 type Comment func(*sql.Selector)
 
+// Playback is the predicate function for playback builders.
+type Playback func(*sql.Selector)
+
 // Video is the predicate function for video builders.
 type Video func(*sql.Selector)

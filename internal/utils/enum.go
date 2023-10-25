@@ -41,3 +41,17 @@ func (AsynqQueue) Values() (kinds []string) {
 	}
 	return
 }
+
+type PlaybackStatus string
+
+const (
+	PlaybackInProgress PlaybackStatus = "in_progress"
+	PlaybackFinished   PlaybackStatus = "finished"
+)
+
+func (PlaybackStatus) Values() (kinds []string) {
+	for _, s := range []PlaybackStatus{PlaybackInProgress, PlaybackFinished} {
+		kinds = append(kinds, string(s))
+	}
+	return
+}

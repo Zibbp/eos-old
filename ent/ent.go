@@ -14,6 +14,7 @@ import (
 	"github.com/zibbp/eos/ent/channel"
 	"github.com/zibbp/eos/ent/chapter"
 	"github.com/zibbp/eos/ent/comment"
+	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/ent/video"
 )
 
@@ -41,10 +42,11 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		channel.Table: channel.ValidColumn,
-		chapter.Table: chapter.ValidColumn,
-		comment.Table: comment.ValidColumn,
-		video.Table:   video.ValidColumn,
+		channel.Table:  channel.ValidColumn,
+		chapter.Table:  chapter.ValidColumn,
+		comment.Table:  comment.ValidColumn,
+		playback.Table: playback.ValidColumn,
+		video.Table:    video.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

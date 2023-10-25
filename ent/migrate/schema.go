@@ -74,6 +74,21 @@ var (
 			},
 		},
 	}
+	// PlaybacksColumns holds the columns for the "playbacks" table.
+	PlaybacksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "video_id", Type: field.TypeString},
+		{Name: "timestamp", Type: field.TypeInt, Default: 0},
+		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"in_progress", "playback_finished"}, Default: "in_progress"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// PlaybacksTable holds the schema information for the "playbacks" table.
+	PlaybacksTable = &schema.Table{
+		Name:       "playbacks",
+		Columns:    PlaybacksColumns,
+		PrimaryKey: []*schema.Column{PlaybacksColumns[0]},
+	}
 	// VideosColumns holds the columns for the "videos" table.
 	VideosColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -132,6 +147,7 @@ var (
 		ChannelsTable,
 		ChaptersTable,
 		CommentsTable,
+		PlaybacksTable,
 		VideosTable,
 	}
 )

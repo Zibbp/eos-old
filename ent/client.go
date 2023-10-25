@@ -8,11 +8,13 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/google/uuid"
 	"github.com/zibbp/eos/ent/migrate"
 
 	"github.com/zibbp/eos/ent/channel"
 	"github.com/zibbp/eos/ent/chapter"
 	"github.com/zibbp/eos/ent/comment"
+	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/ent/video"
 
 	"entgo.io/ent/dialect"
@@ -31,6 +33,8 @@ type Client struct {
 	Chapter *ChapterClient
 	// Comment is the client for interacting with the Comment builders.
 	Comment *CommentClient
+	// Playback is the client for interacting with the Playback builders.
+	Playback *PlaybackClient
 	// Video is the client for interacting with the Video builders.
 	Video *VideoClient
 }
@@ -49,6 +53,7 @@ func (c *Client) init() {
 	c.Channel = NewChannelClient(c.config)
 	c.Chapter = NewChapterClient(c.config)
 	c.Comment = NewCommentClient(c.config)
+	c.Playback = NewPlaybackClient(c.config)
 	c.Video = NewVideoClient(c.config)
 }
 
@@ -81,12 +86,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Channel: NewChannelClient(cfg),
-		Chapter: NewChapterClient(cfg),
-		Comment: NewCommentClient(cfg),
-		Video:   NewVideoClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		Channel:  NewChannelClient(cfg),
+		Chapter:  NewChapterClient(cfg),
+		Comment:  NewCommentClient(cfg),
+		Playback: NewPlaybackClient(cfg),
+		Video:    NewVideoClient(cfg),
 	}, nil
 }
 
@@ -104,12 +110,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Channel: NewChannelClient(cfg),
-		Chapter: NewChapterClient(cfg),
-		Comment: NewCommentClient(cfg),
-		Video:   NewVideoClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		Channel:  NewChannelClient(cfg),
+		Chapter:  NewChapterClient(cfg),
+		Comment:  NewCommentClient(cfg),
+		Playback: NewPlaybackClient(cfg),
+		Video:    NewVideoClient(cfg),
 	}, nil
 }
 
@@ -141,6 +148,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Channel.Use(hooks...)
 	c.Chapter.Use(hooks...)
 	c.Comment.Use(hooks...)
+	c.Playback.Use(hooks...)
 	c.Video.Use(hooks...)
 }
 
@@ -150,6 +158,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Channel.Intercept(interceptors...)
 	c.Chapter.Intercept(interceptors...)
 	c.Comment.Intercept(interceptors...)
+	c.Playback.Intercept(interceptors...)
 	c.Video.Intercept(interceptors...)
 }
 
@@ -162,6 +171,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Chapter.mutate(ctx, m)
 	case *CommentMutation:
 		return c.Comment.mutate(ctx, m)
+	case *PlaybackMutation:
+		return c.Playback.mutate(ctx, m)
 	case *VideoMutation:
 		return c.Video.mutate(ctx, m)
 	default:
@@ -565,6 +576,123 @@ func (c *CommentClient) mutate(ctx context.Context, m *CommentMutation) (Value, 
 		return (&CommentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Comment mutation op: %q", m.Op())
+	}
+}
+
+// PlaybackClient is a client for the Playback schema.
+type PlaybackClient struct {
+	config
+}
+
+// NewPlaybackClient returns a client for the Playback from the given config.
+func NewPlaybackClient(c config) *PlaybackClient {
+	return &PlaybackClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `playback.Hooks(f(g(h())))`.
+func (c *PlaybackClient) Use(hooks ...Hook) {
+	c.hooks.Playback = append(c.hooks.Playback, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `playback.Intercept(f(g(h())))`.
+func (c *PlaybackClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Playback = append(c.inters.Playback, interceptors...)
+}
+
+// Create returns a builder for creating a Playback entity.
+func (c *PlaybackClient) Create() *PlaybackCreate {
+	mutation := newPlaybackMutation(c.config, OpCreate)
+	return &PlaybackCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Playback entities.
+func (c *PlaybackClient) CreateBulk(builders ...*PlaybackCreate) *PlaybackCreateBulk {
+	return &PlaybackCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Playback.
+func (c *PlaybackClient) Update() *PlaybackUpdate {
+	mutation := newPlaybackMutation(c.config, OpUpdate)
+	return &PlaybackUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PlaybackClient) UpdateOne(pl *Playback) *PlaybackUpdateOne {
+	mutation := newPlaybackMutation(c.config, OpUpdateOne, withPlayback(pl))
+	return &PlaybackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PlaybackClient) UpdateOneID(id uuid.UUID) *PlaybackUpdateOne {
+	mutation := newPlaybackMutation(c.config, OpUpdateOne, withPlaybackID(id))
+	return &PlaybackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Playback.
+func (c *PlaybackClient) Delete() *PlaybackDelete {
+	mutation := newPlaybackMutation(c.config, OpDelete)
+	return &PlaybackDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PlaybackClient) DeleteOne(pl *Playback) *PlaybackDeleteOne {
+	return c.DeleteOneID(pl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PlaybackClient) DeleteOneID(id uuid.UUID) *PlaybackDeleteOne {
+	builder := c.Delete().Where(playback.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PlaybackDeleteOne{builder}
+}
+
+// Query returns a query builder for Playback.
+func (c *PlaybackClient) Query() *PlaybackQuery {
+	return &PlaybackQuery{
+		config: c.config,
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Playback entity by its id.
+func (c *PlaybackClient) Get(ctx context.Context, id uuid.UUID) (*Playback, error) {
+	return c.Query().Where(playback.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PlaybackClient) GetX(ctx context.Context, id uuid.UUID) *Playback {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PlaybackClient) Hooks() []Hook {
+	return c.hooks.Playback
+}
+
+// Interceptors returns the client interceptors.
+func (c *PlaybackClient) Interceptors() []Interceptor {
+	return c.inters.Playback
+}
+
+func (c *PlaybackClient) mutate(ctx context.Context, m *PlaybackMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PlaybackCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PlaybackUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PlaybackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PlaybackDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Playback mutation op: %q", m.Op())
 	}
 }
 

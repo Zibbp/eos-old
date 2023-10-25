@@ -115,6 +115,14 @@ func groupV1Routes(e *echo.Group, h *Handler) {
 	tasksGroup.POST("/video/generate_thumbnails", h.StartVideoGenerateAllThumbnailsTask)
 	tasksGroup.POST("/video/generate_thumbnails/:id", h.StartVideoGenerateThumbnailsTask)
 	tasksGroup.POST("/video/download_thumbnails", h.StartVideoDownloadThumbnailsTask)
+
+	// Playback group
+	playbackGroup := e.Group("/playback")
+	playbackGroup.POST("/:video_id", UpdateProgress)
+	playbackGroup.GET("/:video_id", GetProgress)
+	playbackGroup.GET("", GetAllProgress)
+	playbackGroup.DELETE("/:video_id", DeleteProgress)
+
 }
 
 func (h *Handler) Serve() error {

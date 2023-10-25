@@ -9,11 +9,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/zibbp/eos/ent/channel"
 	"github.com/zibbp/eos/ent/chapter"
 	"github.com/zibbp/eos/ent/comment"
+	"github.com/zibbp/eos/ent/playback"
 	"github.com/zibbp/eos/ent/predicate"
 	"github.com/zibbp/eos/ent/video"
+	"github.com/zibbp/eos/internal/utils"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -28,10 +31,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeChannel = "Channel"
-	TypeChapter = "Chapter"
-	TypeComment = "Comment"
-	TypeVideo   = "Video"
+	TypeChannel  = "Channel"
+	TypeChapter  = "Chapter"
+	TypeComment  = "Comment"
+	TypePlayback = "Playback"
+	TypeVideo    = "Video"
 )
 
 // ChannelMutation represents an operation that mutates the Channel nodes in the graph.
@@ -2211,6 +2215,612 @@ func (m *CommentMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Comment edge %s", name)
+}
+
+// PlaybackMutation represents an operation that mutates the Playback nodes in the graph.
+type PlaybackMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	video_id      *string
+	timestamp     *int
+	addtimestamp  *int
+	status        *utils.PlaybackStatus
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Playback, error)
+	predicates    []predicate.Playback
+}
+
+var _ ent.Mutation = (*PlaybackMutation)(nil)
+
+// playbackOption allows management of the mutation configuration using functional options.
+type playbackOption func(*PlaybackMutation)
+
+// newPlaybackMutation creates new mutation for the Playback entity.
+func newPlaybackMutation(c config, op Op, opts ...playbackOption) *PlaybackMutation {
+	m := &PlaybackMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePlayback,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPlaybackID sets the ID field of the mutation.
+func withPlaybackID(id uuid.UUID) playbackOption {
+	return func(m *PlaybackMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Playback
+		)
+		m.oldValue = func(ctx context.Context) (*Playback, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Playback.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPlayback sets the old Playback of the mutation.
+func withPlayback(node *Playback) playbackOption {
+	return func(m *PlaybackMutation) {
+		m.oldValue = func(context.Context) (*Playback, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PlaybackMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PlaybackMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Playback entities.
+func (m *PlaybackMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PlaybackMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PlaybackMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Playback.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetVideoID sets the "video_id" field.
+func (m *PlaybackMutation) SetVideoID(s string) {
+	m.video_id = &s
+}
+
+// VideoID returns the value of the "video_id" field in the mutation.
+func (m *PlaybackMutation) VideoID() (r string, exists bool) {
+	v := m.video_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVideoID returns the old "video_id" field's value of the Playback entity.
+// If the Playback object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlaybackMutation) OldVideoID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVideoID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVideoID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVideoID: %w", err)
+	}
+	return oldValue.VideoID, nil
+}
+
+// ResetVideoID resets all changes to the "video_id" field.
+func (m *PlaybackMutation) ResetVideoID() {
+	m.video_id = nil
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (m *PlaybackMutation) SetTimestamp(i int) {
+	m.timestamp = &i
+	m.addtimestamp = nil
+}
+
+// Timestamp returns the value of the "timestamp" field in the mutation.
+func (m *PlaybackMutation) Timestamp() (r int, exists bool) {
+	v := m.timestamp
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimestamp returns the old "timestamp" field's value of the Playback entity.
+// If the Playback object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlaybackMutation) OldTimestamp(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimestamp is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimestamp requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimestamp: %w", err)
+	}
+	return oldValue.Timestamp, nil
+}
+
+// AddTimestamp adds i to the "timestamp" field.
+func (m *PlaybackMutation) AddTimestamp(i int) {
+	if m.addtimestamp != nil {
+		*m.addtimestamp += i
+	} else {
+		m.addtimestamp = &i
+	}
+}
+
+// AddedTimestamp returns the value that was added to the "timestamp" field in this mutation.
+func (m *PlaybackMutation) AddedTimestamp() (r int, exists bool) {
+	v := m.addtimestamp
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTimestamp resets all changes to the "timestamp" field.
+func (m *PlaybackMutation) ResetTimestamp() {
+	m.timestamp = nil
+	m.addtimestamp = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *PlaybackMutation) SetStatus(us utils.PlaybackStatus) {
+	m.status = &us
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *PlaybackMutation) Status() (r utils.PlaybackStatus, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Playback entity.
+// If the Playback object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlaybackMutation) OldStatus(ctx context.Context) (v utils.PlaybackStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ClearStatus clears the value of the "status" field.
+func (m *PlaybackMutation) ClearStatus() {
+	m.status = nil
+	m.clearedFields[playback.FieldStatus] = struct{}{}
+}
+
+// StatusCleared returns if the "status" field was cleared in this mutation.
+func (m *PlaybackMutation) StatusCleared() bool {
+	_, ok := m.clearedFields[playback.FieldStatus]
+	return ok
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *PlaybackMutation) ResetStatus() {
+	m.status = nil
+	delete(m.clearedFields, playback.FieldStatus)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *PlaybackMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *PlaybackMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Playback entity.
+// If the Playback object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlaybackMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *PlaybackMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *PlaybackMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *PlaybackMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Playback entity.
+// If the Playback object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PlaybackMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *PlaybackMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the PlaybackMutation builder.
+func (m *PlaybackMutation) Where(ps ...predicate.Playback) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PlaybackMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PlaybackMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Playback, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PlaybackMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PlaybackMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Playback).
+func (m *PlaybackMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PlaybackMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.video_id != nil {
+		fields = append(fields, playback.FieldVideoID)
+	}
+	if m.timestamp != nil {
+		fields = append(fields, playback.FieldTimestamp)
+	}
+	if m.status != nil {
+		fields = append(fields, playback.FieldStatus)
+	}
+	if m.created_at != nil {
+		fields = append(fields, playback.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, playback.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PlaybackMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case playback.FieldVideoID:
+		return m.VideoID()
+	case playback.FieldTimestamp:
+		return m.Timestamp()
+	case playback.FieldStatus:
+		return m.Status()
+	case playback.FieldCreatedAt:
+		return m.CreatedAt()
+	case playback.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PlaybackMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case playback.FieldVideoID:
+		return m.OldVideoID(ctx)
+	case playback.FieldTimestamp:
+		return m.OldTimestamp(ctx)
+	case playback.FieldStatus:
+		return m.OldStatus(ctx)
+	case playback.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case playback.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Playback field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PlaybackMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case playback.FieldVideoID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVideoID(v)
+		return nil
+	case playback.FieldTimestamp:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimestamp(v)
+		return nil
+	case playback.FieldStatus:
+		v, ok := value.(utils.PlaybackStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case playback.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case playback.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Playback field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PlaybackMutation) AddedFields() []string {
+	var fields []string
+	if m.addtimestamp != nil {
+		fields = append(fields, playback.FieldTimestamp)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PlaybackMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case playback.FieldTimestamp:
+		return m.AddedTimestamp()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PlaybackMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case playback.FieldTimestamp:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTimestamp(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Playback numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PlaybackMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(playback.FieldStatus) {
+		fields = append(fields, playback.FieldStatus)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PlaybackMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PlaybackMutation) ClearField(name string) error {
+	switch name {
+	case playback.FieldStatus:
+		m.ClearStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown Playback nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PlaybackMutation) ResetField(name string) error {
+	switch name {
+	case playback.FieldVideoID:
+		m.ResetVideoID()
+		return nil
+	case playback.FieldTimestamp:
+		m.ResetTimestamp()
+		return nil
+	case playback.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case playback.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case playback.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Playback field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PlaybackMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PlaybackMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PlaybackMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PlaybackMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PlaybackMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PlaybackMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PlaybackMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Playback unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PlaybackMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Playback edge %s", name)
 }
 
 // VideoMutation represents an operation that mutates the Video nodes in the graph.

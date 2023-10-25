@@ -18,6 +18,8 @@ type Tx struct {
 	Chapter *ChapterClient
 	// Comment is the client for interacting with the Comment builders.
 	Comment *CommentClient
+	// Playback is the client for interacting with the Playback builders.
+	Playback *PlaybackClient
 	// Video is the client for interacting with the Video builders.
 	Video *VideoClient
 
@@ -154,6 +156,7 @@ func (tx *Tx) init() {
 	tx.Channel = NewChannelClient(tx.config)
 	tx.Chapter = NewChapterClient(tx.config)
 	tx.Comment = NewCommentClient(tx.config)
+	tx.Playback = NewPlaybackClient(tx.config)
 	tx.Video = NewVideoClient(tx.config)
 }
 
