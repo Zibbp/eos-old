@@ -1,3 +1,7 @@
+# ARCHIVED
+
+This repository is no longer maintained. See the [Eos](https://github.com/Zibbp/eos) repository for an updated version.
+
 <br />
 <div align="center">
   <a>
